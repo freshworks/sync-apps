@@ -1,0 +1,16 @@
+{
+  "platform-version": "2.0",
+  "product": {
+    "freshteam": {
+        "location": {
+            "job_boards": {
+                "url": "template.html",
+                "icon": "icon.svg"
+             }
+        }
+    }
+  },
+  "dependencies": {
+      "ipaas-sync": "0.0.2-beta-22"
+  }
+}

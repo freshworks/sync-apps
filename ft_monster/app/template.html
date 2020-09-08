@@ -1,0 +1,120 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script src="https://static.freshdev.io/fdk/2.0/assets/fresh_client.js"></script>
+<script type="module" src="https://unpkg.com/@freshworks/crayons/dist/crayons/crayons.esm.js"></script>
+<script nomodule src="https://unpkg.com/@freshworks/crayons/dist/crayons/crayons.js"></script>
+
+
+<fw-icon name="company" size="18" color="blue"></fw-icon>
+<fw-label value="  Monster job board  " color="blue"></fw-label>
+</br></br>
+<fw-toggle id="publishToggle" size="medium"></fw-toggle>
+<fw-label id="publishStatus" value="Unpublished" color="green"></fw-label>
+</br></br>
+<fw-button id="getMonsterJobDetails">Get Details</fw-button>
+<div id="detailsDiv"></div>
+<script type= "text/javascript">
+app.initialized()
+		.then(function (_client) {
+            window.client = _client;
+            document.getElementById("publishToggle").addEventListener("fwChange", showPublishModal);
+            document.getElementById("getMonsterJobDetails").addEventListener("fwClick", getMonsterJobDetails);
+            client.data.get("jobPosting").then(
+                function(jobPosting){
+                    client.request.invoke('getCache',{}).then(
+                            function(data){
+                                var configs = data.response;
+                                var jobPostingData = configs.job_postings;
+                                if(jobPostingData != null && jobPostingData.hasOwnProperty(jobPosting['id']) &&  
+                                jobPostingData[jobPosting['id']]['published'] ){
+                                    $('fw-toggle#publishToggle').prop('checked', true);
+                                    $('fw-label#publishStatus').val('Published');
+                                }
+                            },
+                            function(error){
+                                console.log('Error while fetching the configs.', error);
+                            }
+                    )
+                }
+            )
+            
+        });
+
+function showPublishModal(){
+    client.interface.trigger("showModal", {
+    title: "Publish job",
+    template: "publish.html",
+    }).then(function(data) {
+        console.log("Published model rendered.")
+    }).
+    catch(function(error) {
+        console.log("Published model render failed with error.", error)
+    });
+}
+
+function getMonsterJobDetails() {
+    console.log(client, client.request)
+    fetchMonsterJobDetails().then(
+        function(success) {
+            var title = success.substring(success.indexOf('JobTitle') + 9, success.lastIndexOf('JobTitle')-2)
+            var jobdesc = success.substring(success.indexOf('JobBody') + 9, success.lastIndexOf('JobBody')-2)
+            console.log('title: ', title, 'job body: ', jobdesc)
+            var html = `<fw-label value="Job title: ${title}"></fw-label></br></br><fw-label value="Job description: ${jobdesc}"></fw-label>`
+            $('div#detailsDiv').html(html);
+        },
+        function(error) {
+            console.log('Error while fetching details', error)
+            alert('Error in fetching details')
+        }
+    )
+    
+}
+
+async function fetchMonsterJobDetails() {
+    var jobPostingData = await client.data.get("jobPosting");
+    console.log('Request to fetch the job details of ', jobPostingData['id'], ' invoked');
+    try {
+        var jobReferenceCode = jobPostingData['id'];
+        var requestPayload = `<?xml version="1.0" encoding="UTF-8"?>
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <soapenv:Header>
+            <ns1:MonsterHeader xmlns:ns1="http://schemas.monster.com/MonsterHeader">
+            <ns1:From>
+                <ns1:PartyId partyType="organization"/>
+                <ns1:Authentication>
+                <ns1:SharedSecret>
+                    <ns1:UserName>xrtpjobsx01</ns1:UserName>
+                    <ns1:Password>rtp987654</ns1:Password>
+                </ns1:SharedSecret>
+                </ns1:Authentication>
+            </ns1:From>
+            <ns1:ProcessingReceiptRequest>
+                <ns1:Address transportType="https">https</ns1:Address>
+            </ns1:ProcessingReceiptRequest>
+            </ns1:MonsterHeader>
+        </soapenv:Header>
+        <soapenv:Body>
+            <Query xmlns="http://schemas.monster.com/Monster" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.monster.com/Monster http://schemas.monster.com/Current/xsd/Monster.xsd">
+            <Target>Jobs</Target>
+            <SelectBy>
+                <Criteria>JobRefCode</Criteria>
+                <Value>${jobReferenceCode}</Value>
+                <Criteria>RecruiterName</Criteria>
+                <Value>xrtpjobsx01</Value>
+            </SelectBy>
+            </Query>
+        </soapenv:Body>
+        </soapenv:Envelope>`
+        console.log(requestPayload)
+        var body = {
+            'body': requestPayload,
+            'headers': {'content-type': 'application/xml'}
+        }
+        var response = await client.request.post('https://gateway.monster.com:8443/bgwBroker', body)
+        return response.response;
+    } catch(e) {
+        console.log('Error while fetching the monster job details', e);
+    }
+}
+
+</script>
+
