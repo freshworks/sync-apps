@@ -1,0 +1,26 @@
+{
+  "name": "sync-connectors",
+  "version": "1.0.0",
+  "description": "Schema Converter",
+  "main": "index.js",
+  "scripts": {
+    "test": "",
+    "docs:dev": "vuepress dev documentation",
+    "docs:build": "vuepress build documentation"
+  },
+  "author": "Freshworks",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/plugin-transform-runtime": "^7.11.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "chai": "^4.2.0",
+    "deep-equal-in-any-order": "^1.0.27",
+    "http-constants": "^2.1.0-6-g849c1e3",
+    "mocha": "^7.2.0",
+    "request": "^2.88.2",
+    "sinon": "^9.0.2"
+  },
+  "devDependencies": {
+    "vuepress": "^1.5.4"
+  }
+}
