@@ -1,0 +1,2993 @@
+swagger: '2.0'
+info:
+  title: Freshpipe API
+  version: 1.0.0
+  license:
+    name: IPAAS
+    url: 'https://www.freshpipe.co'
+  description: Freshpipe API
+  contact:
+    name: IPaaS Team
+    email: freshpipe-platform@freshworks.com
+    url: 'https://www.freshpipe.co'
+host: 'localhost'
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /integration-rest/integrations:
+    parameters:
+      - in: query
+        name: appuuid
+        description: Unique identifier of an App
+        required: true
+        type: string
+    post:
+      tags:
+        - Integration
+      summary: Create Integration
+      description: Create Integration
+      operationId: createIntegration
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          description: To create reverse integration, this value is set to true
+          name: createReverseIntegration
+          type: boolean
+        - in: query
+          description: vendorAccountId
+          name: vendorAccountId
+          type: integer
+        - in: query
+          description: Product name 
+          name: product
+          type: string
+        - in: header
+          name: internal
+          type: boolean
+        - in: header
+          name: internal_secret
+          type: string
+      responses:
+        '201':
+          description: Integration details
+          schema:
+            $ref: '#/definitions/IntegrationList'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - Integration
+      summary: Fetch list of integrations
+      description: Fetch list of integrations belonging to the account, app and product combination
+      operationId: getIntegrations
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Integration Details
+          schema:
+            $ref: '#/definitions/IntegrationList'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - Integration
+      summary: Delete integrations
+      description: Deleting the list of integrations belonging to the account, app and product combination
+      operationId: deleteIntegrations
+      produces:
+        - application/json
+      responses:
+        '204':
+          description: Deleted integration
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /integration-rest/integrations/{id}:
+    get:
+      tags:
+        - Integration
+      summary: Fetch details of an Integration
+      description: Fetch details of an Integration with the given integrationId
+      operationId: getIntegrationById
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Unique Identifier of an Integration
+          required: true
+          type: integer
+          minimum: 1
+          format: int64
+      responses:
+        '200':
+          description: Integration Details
+          schema:
+            $ref: '#/definitions/Integration'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /integration-rest/apps/{appuuid}/details:
+    parameters:
+      - description: Unique identifier of the app
+        in: path
+        name: appuuid
+        required: true
+        type: string
+    post:
+      tags:
+        - App
+      summary: Save an app configuration details
+      description: |
+        Used to store an App Configuration details in the platform.
+        App configuration details are data which is related to specific app per account of the product.
+        Details are stored as JSON objects so the payload should contain a valid JSON object.
+        For example,
+        {"webhook": "http://localhost:10001/event/hook/freshsales"}
+        This webhook url cannot be stored in marketplace before app installation.
+        Instead of storing it in marketplace, webhook url can be added in app configurarion details.
+        App configurarion details can be retrieved from platform using the GET method.
+      operationId: saveAppDetails
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: AccountAppDetails
+          in: body
+          schema:
+            $ref: '#/definitions/AccountAppDetails'
+      responses:
+        '201':
+          description: App details
+          schema:
+            $ref: '#/definitions/AccountAppDetails'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      tags:
+        - App
+      summary: Update an App Configuration details
+      description: |
+        Used to update an App Configuration details which are stored in the platform.
+        App configuration details are data which is related to specific app per account of the product.
+        Details are stored as JSON objects so the payload should contain a valid JSON object.
+        An update can be a modification of existing details or the addition of new details.
+        For example,
+        {"webhook": "http://localhost:10001/event/hook/freshsales"}
+        This webhook URL cannot be stored in the marketplace before the app installation.
+        Instead of storing it in the marketplace, the webhook URL can be added to the app configuration details.
+        App configuration details can be retrieved from the platform using the GET method.
+      operationId: updateAppDetails
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: AccountAppDetails
+          in: body
+          schema:
+            $ref: '#/definitions/AccountAppDetails'
+      responses:
+        '200':
+          description: App details
+          schema:
+            $ref: '#/definitions/AccountAppDetails'
+        '400':
+          description: Bad request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - App
+      summary: Fetch an app configuration details
+      description: Fetch an app configuration details
+      operationId: getAppDetails
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: App details
+          schema:
+            $ref: '#/definitions/AccountAppDetails'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - App
+      summary: Delete the configuration details of an app with the given appuuid and accountId
+      description: Delete the configuration details of an app with the given appuuid and accountId
+      operationId: deleteAppDetails
+      produces:
+        - application/json
+      responses:
+        '204':
+          description: Deleted app details
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /integration-rest/accounts:
+    get:
+      tags:
+        - Integration
+      summary: Get IPaaS Account Details
+      description: |
+        Get the account details of any IPaaS account using the vendorAccountId and product combination.
+      operationId: getIPaaSAccount
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Account Details
+          schema:
+            $ref: '#/definitions/Account'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /integration-rest/apps:
+    delete:
+      tags:
+        - Integration
+      summary: Delete App
+      description: Delete app details in IPaaS - used for app uninstallation from marketplace apps
+      operationId: deleteApp
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: appuuid
+          description: Unique identifier of an App
+          required: true
+          type: string
+      responses:
+        '204':
+          description: Deleted apps
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /integration-rest/forms:
+    post:
+      tags:
+        - Form
+      summary: Create a form
+      description: Create a form
+      operationId: createForm
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: form
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Form'
+      responses:
+        '201':
+          description: Form details
+          schema:
+            $ref: '#/definitions/Form'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - Form
+      summary: Fetch details of a form
+      description: Fetch details of a form
+      operationId: getForm
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: appuuid
+          description: Unique Identifier of App
+          required: true
+          type: string
+        - in: query
+          name: name
+          description: Name of the form
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Form details
+          schema:
+            $ref: '#/definitions/Form'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - Form
+      summary: delete form
+      description: delete form
+      operationId: deleteForm
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: appuuid
+          description: Unique Identifier of an App
+          required: true
+          type: string
+        - in: query
+          name: name
+          description: Name of the form
+          type: string
+      responses:
+        '204':
+          description: deleted Form
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /integration-rest/forms/{id}:
+    get:
+      tags:
+        - Form
+      summary: Fetch details of a form
+      description: Fetch details of a form
+      operationId: getFormById
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Unique Identifier of Form
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Form details
+          schema:
+            $ref: '#/definitions/Form'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      tags:
+        - Form
+      summary: update form details
+      description: update form details
+      operationId: updateForm
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Unique Identifier of a Form
+          required: true
+          type: integer
+          format: int64
+        - name: Form
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Form'
+      responses:
+        '200':
+          description: Form details
+          schema:
+            $ref: '#/definitions/Form'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - Form
+      summary: delete form
+      description: delete form
+      operationId: deleteFormById
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Unique Identifier of a Form
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: Deleted Form
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /integration-rest/mappingforms:
+    post:
+      tags:
+        - Form
+      summary: Create a Mapping form
+      description: Create a Mapping form for a transformation between two schemas of different connectors
+      operationId: createMappingForm
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: mappingform
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/MappingForm'
+      responses:
+        '201':
+          description: Mapping Form details
+          schema:
+            $ref: '#/definitions/Form'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - Form
+      summary: Fetch Mapping Form
+      description: Fetch Mapping Form
+      operationId: getMappingForm
+      produces:
+        - text/html
+        - application/json
+      parameters:
+        - in: body
+          name: mappingForm
+          description: Payload for fetching the mapping form
+          required: true
+          schema:
+            $ref: '#/definitions/MappingForm'
+      responses:
+        '200':
+          description: Mapping Form
+          examples:
+            text/html:
+              <div></div>
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      tags:
+        - Form
+      summary: Update Mapping Form
+      description: Update Mapping Form
+      operationId: updateMappingForm
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: mappingForm
+          description: Payload for updating the mapping form
+          required: true
+          schema:
+            $ref: '#/definitions/MappingForm'
+      responses:
+        '200':
+          description: Mapping Form details
+          schema:
+            $ref: '#/definitions/Form'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /generic-connector-rest/connectors/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: Unique identifier of an Connector
+        required: true
+        type: integer
+        format: int64
+    get:
+      tags:
+        - Connector
+      summary: Fetch Connector details
+      description: |
+        Used to fetch connector details of a particular connector from the platform.
+        Connector details include product credentials, product API endpoints, etc.
+        Connector details are used to authenticate the product and to invoke appropriate product API calls.
+        Connector details are fetched to know the existing connector details. 
+      operationId: getConnectorById
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Connector details
+          schema:
+            $ref: '#/definitions/Connector'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      tags:
+        - Connector
+      summary: Update a Connector
+      description: |
+        Used to update connector details in the platform.
+        Connector details include product credentials, product API endpoints, etc.
+        Connector details are used to authenticate the product and to invoke appropriate product API calls.
+        Product endpoints are used to perform operations like entity creation, updation, schema fetch in the platform.
+        Connector details are updated in the app when connecting a source/destination connector.
+        Credentials in connector details should be valid otherwise details will not be updated.
+        For example,
+        {
+          "details": {
+            "domain": 'https://freshpipe.fsales.io/',
+            "healthCheckPath": '/api/sales_activities',
+            "expectedStatusCode": 200,
+            "authType": 'auth_header',
+            "token": 'Token token=xxxxxxxxxxxx',
+          }
+        }
+        If the connector user changes the API key/token, then connector details should be updated on the platform.
+      operationId: updateConnector
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: data
+          in: body
+          schema:
+            $ref: '#/definitions/Connector'
+          required: true
+        - name: isOauthRegister
+          in: query
+          type: boolean
+          required: false
+      responses:
+        '200':
+          description: Connector details
+          schema:
+            $ref: '#/definitions/Connector'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - Connector
+      summary: Delete a Connector
+      description: Delete a Connector
+      operationId: deleteConnectorById
+      produces:
+        - application/json
+      responses:
+        '204':
+          description: Deleted connector
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /transformation-rest/schemas:
+    post:
+      tags:
+        - Connector
+      summary: Create a schema for Connector
+      description: Create schema of an entity belonging to a Connector
+      operationId: createSchema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: schema
+          in: body
+          schema:
+            $ref: '#/definitions/Schema'
+      responses:
+        '201':
+          description: Schema details
+          schema:
+            $ref: '#/definitions/Schema'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /transformation-rest/schemas/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: Unique Identifier of a Schema
+        required: true
+        type: integer
+        format: int64
+    put:
+      tags:
+        - Connector
+      summary: Update a schema
+      description: Update schema of an entity belonging to a Connector
+      operationId: updateSchema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: schema
+          in: body
+          schema:
+            $ref: '#/definitions/Schema'
+      responses:
+        '200':
+          description: Schema details
+          schema:
+            $ref: '#/definitions/Schema'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - Connector
+      summary: Get a schema
+      description: Get schema of an entity by ID
+      operationId: getSchemaById
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Schema details
+          schema:
+            $ref: '#/definitions/Schema'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  /generic-connector-rest/connectors/{id}/schemas:
+    parameters:
+      - in: path
+        name: id
+        description: Unique Identifier of a Connector
+        required: true
+        type: integer
+        format: int64
+    get:
+      tags:
+        - Connector
+      summary: Get all schemas
+      description: | 
+        Used to fetch all the schemas of particular connector from the platform.
+        Schema is the metadata about an entity. 
+        It contains the field names that are present in the entity and their respective datatypes.
+        Schemas are fetched in the app while mapping fields, etc.
+      operationId: getSchemasByConnectorId
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Fetch schema for Connector
+          schema:
+            $ref: '#/definitions/SchemaList'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/matching-rest/transformationGroups/{id}/objectReferences':
+    parameters:
+      - in: path
+        name: id
+        description: Unique Identifier of a Transformation group
+        required: true
+        type: integer
+        format: int64
+    delete:
+      tags:
+        - Matching
+      summary: Delete object references
+      description: |
+        Used to delete object references of a particular transformation group on the platform.
+        Object reference means unique reference data of the particular entity.
+        Object reference data includes object id, matching value such as email, etc.
+        Object references are used to decide whether sync operation is entity create, update, or delete.
+        During initial sync and event sync, these references are created.
+        When we uninstall the app or want to start fresh sync, this operation should be performed.
+        In the transformation group, one source and one destination entity are associated.
+        For example,
+        The transformation group consists of Freshsales contact and Freshdesk contact.
+        All object references of both Freshsales contact and Freshdesk contact are deleted in the platform during this operation.
+      operationId: deleteObjectReferencesByTransformationGroup
+      produces:
+        - application/json
+      responses:
+        '204':
+          description: Deleted object references
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/matching-rest/transformationGroups/{id}/matchingSettings':
+    parameters:
+      - in: path
+        name: id
+        description: Unique Identifier of a Transformation group
+        required: true
+        type: integer
+        format: int64
+    post:
+      tags:
+        - Transformation
+      summary: Save matching settings
+      description: Save matching settings for a transformationGroup
+      operationId: saveMatchingSettings
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: MatchingSettings
+          in: body
+          schema:
+            $ref: '#/definitions/MatchingSettings'
+      responses:
+        '201':
+          description: MatchingSetting details
+          schema:
+            $ref: '#/definitions/MatchingSettings'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      tags:
+        - Transformation
+      summary: Update matching settings
+      description: Update matching settings for the transformation group
+      operationId: updateMatchingSettings
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: MatchingSettings
+          in: body
+          schema:
+            $ref: '#/definitions/MatchingSettings'
+      responses:
+        '200':
+          description: MatchingSetting details
+          schema:
+            $ref: '#/definitions/MatchingSettings'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - Transformation
+      summary: Delete matching settings
+      description: Delete matching settings of a transformation group
+      operationId: deleteMatchingSettingsByTransformationGroup
+      produces:
+        - application/json
+      responses:
+        '204':
+          description: Deleted MatchingSettings
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/matching-rest/objectReferences':
+    get:
+      tags:
+        - Matching
+      summary: Get the Object References
+      description: |
+        Search the Object References using either of the following combinations
+        - transformationGroupId, schemaId, matchingValue
+        - transformationGroupId, schemaId, objectId
+        - transformationGroupId, schemaId, objectId, toSchemaId
+      operationId: getObjectReferences
+      produces:
+        - application/json
+      parameters:
+        - name: transformationGroupId
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: schemaId
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: matchingValue
+          in: query
+          type: string
+          required: false
+        - name: objectId
+          in: query
+          type: string
+          required: false
+        - name: toSchemaId
+          in: query
+          type: integer
+          format: int64
+          required: false
+      responses:
+        '200':
+          description: ObjectReferences details
+          schema: 
+            $ref: '#/definitions/ObjectReferenceList'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      tags:
+        - Matching
+      summary: Create/Update an object reference.
+      description: |
+        Used to create object references of a particular transformation group on the platform.
+        Object reference means unique reference data of the particular entity and created during initial sync and event sync.
+        The payload of Object reference includes object id, matching value such as email, etc.
+        It is used to decide whether sync operation is entity create, update or delete.
+        To perform sync, the object reference for each entity is created by using this operation.
+        In the transformation group, one source and one destination entity is associated.
+        Example:
+        The transformation group consists of Freshsales contact and HubSpot contact.
+        The objectReference for each new contact is created during sync operation.
+      operationId: saveObjectReferences
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: ObjectReferences
+          in: body
+          schema:
+            $ref: '#/definitions/ObjectReferences'
+      responses:
+        '200':
+          description: ObjectReferences details
+          schema:
+            $ref: '#/definitions/ObjectReferences'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/transformation-rest/integrations/{id}/mappings':
+    get:
+      tags:
+        - Transformation
+      summary: Get transformations
+      description: Get all the transformations of a particular integration
+      operationId: getMappingsOfIntegration
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: Transformations
+          schema:
+            $ref: '#/definitions/MappingList'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/transformation-rest/schemas/{src_schema_id}/schemas/{dest_schema_id}/mappings':
+    get:
+      tags:
+        - Transformation
+      summary: Get transformation
+      description: Get transformations of a particular integration with the source and destination schema IDs
+      operationId: getMappingsBySchemaIds
+      produces:
+        - application/json
+      parameters:
+        - name: src_schema_id
+          in: path
+          type: integer
+          required: true
+        - name: dest_schema_id
+          in: path
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: Transformations
+          schema:
+            $ref: '#/definitions/Mapping'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/transformation-rest/mappings':
+    post:
+      tags:
+        - Transformation
+      summary: Create mapping
+      description: Create mapping
+      operationId: createMapping
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Mapping
+          in: body
+          schema:
+            $ref: '#/definitions/Mapping'
+      responses:
+        '201':
+          description: Mapping details
+          schema:
+            $ref: '#/definitions/Mapping'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/transformation-rest/mappings/{id}':
+    parameters:
+      - in: path
+        name: id
+        description: Unique Identifier of a Mapping
+        required: true
+        type: integer
+        format: int64
+    put:
+      tags:
+        - Transformation
+      summary: Update mapping
+      description: |
+        Used to update the details of a particular transformation's field mapping by using the mapping id.
+        Field mapping is the mapping of source and destination entities' fields.
+        Using this field mapping, a destination payload for sync is created.
+        The updation of mapping can be done at any time.
+        Example:
+        In FS<->HS app, the user mapped only the required field (i.e., email in HubSpot product mapped with email in the Freshsales product).
+        If the user needs to map lastname field in the HubSpot with lastname in the Freshsales, he uses this operation to update the mapping.
+      operationId: updateMapping
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Mapping
+          in: body
+          schema:
+            $ref: '#/definitions/Mapping'
+      responses:
+        '200':
+          description: Mapping details
+          schema:
+            $ref: '#/definitions/Mapping'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - Transformation
+      summary: Fetch details of a Mapping
+      description: |
+        Used to fetch the details of a particular transformation's field mapping by using the mapping id.
+        Field mapping is the mapping of source and destination entities' fields.
+        Using this field mapping, destination payload for sync is created.
+        Field mapping is fetched in the app while viewing the existing mapping and during entity sync in the platform.
+        For example,
+        In FS <-> MC sync, we would like the 'email_address' of MailChimp to be synced to the 'email' field of Freshsales as they serve the same purpose.
+        i.e email_address "super.man@freshworks.com" in MailChimp is synced to email "super.man@freshworks.com" in Freshsales.
+      operationId: getMappingById
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: isReverse
+          description: Reverse mapping is fetched when isReverse is set to true
+          type: boolean
+      responses:
+        '200':
+          description: Mapping details
+          schema:
+            $ref: '#/definitions/Mapping'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - Transformation
+      summary: Delete Mapping
+      description: Delete Mapping
+      operationId: deleteMappingById
+      produces:
+        - application/json
+      responses:
+        '204':
+          description: Mapping details
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/integration-rest/formServMappings/{transformationId}':
+    parameters:
+      - in: path
+        name: transformationId
+        description: Unique identifier of an Transformation
+        required: true
+        type: integer
+        format: int64
+    put:
+      tags:
+        - Transformation
+      summary: Save formServ Mapping
+      description: Save formServ Mapping for the transformation
+      operationId: saveMapping
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: FormServMapping
+          in: body
+          schema:
+            $ref: '#/definitions/FormServMapping'
+      responses:
+        '200':
+          description: FormServMapping details
+          schema:
+            $ref: '#/definitions/FormServMapping'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      tags:
+        - Transformation
+      summary: Fetch details of a FormServMapping
+      description: Fetch details of a FormServMapping
+      operationId: getMappings
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: FormServMapping details
+          schema:
+            $ref: '#/definitions/FormServMapping'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/data-sync-rest/sync':
+    post:
+      tags:
+        - Sync
+      summary: Start a Sync
+      description: Start a Sync
+      operationId: startSync
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: sync
+          in: body
+          schema:
+            $ref: '#/definitions/SyncRequest'
+      responses:
+        '200':
+          description: Sync details
+          schema:
+            $ref: '#/definitions/ObjectSyncStatusList'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/data-sync-rest/bulk/sync':
+    post:
+      tags:
+        - Sync
+      summary: Start bulk Sync
+      description: |
+        Bulk Sync is initiated during InitialSync. 
+        All the entities are fetched and metadata is created in the platform. 
+        After creating metadata the missing entities on both the products are synched across 
+        so that after the initial sync both the accounts have the same number of entities with consistent data. 
+      operationId: startBulkSync
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: isObjectReference
+          description: To create object reference in the system
+          type: boolean
+        - name: sync
+          in: body
+          schema:
+            $ref: '#/definitions/BulkSyncRequest'
+      responses:
+        '201':
+          description: Bulk Sync created
+          schema:
+            $ref: '#/definitions/BulkSyncRequest'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/data-sync-rest/transformations/{id}/objectSyncStatuses':
+    parameters:
+      - in: path
+        name: id
+        description: Unique Identifier of a Transformation 
+        required: true
+        type: integer
+        format: int64
+    delete:
+      tags:
+        - Sync
+      summary: Delete object sync status
+      description: Delete object sync status of a transformation
+      operationId: deleteObjectSyncStatusByTransformation
+      produces:
+        - application/json
+      responses:
+        '204':
+          description: Deleted object sync status
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/data-sync-rest/objects':
+    post:
+      tags:
+        - Sync
+      summary: Clear collision of an object
+      description: Clear collision of an object
+      operationId: clearCollision
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: collisionClearRequest
+          in: body
+          schema:
+            $ref: '#/definitions/ClearCollisionRequest'
+      responses:
+        '201':
+          description: Collision clear details
+          schema:
+            $ref: '#/definitions/ObjectSyncStatusList'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/logging-rest/logs':  
+    get:
+      tags:
+        - Log
+      summary: Fetch logs
+      description: |
+        Fetch logs for any integrationId, transformationId or integration-sourceSchema pair
+      operationId: getLogs
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: sourceSchemaId
+          description: Unique identifier of a Source Schema
+          type: integer
+          format: int64
+        - in: query
+          name: transformationId
+          description: Unique identifier of a Transformation
+          type: integer
+          format: int64
+        - in: query
+          name: integrationId
+          description: Unique identifier of a Integration
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Log details
+          schema:
+            $ref: '#/definitions/LogObjectList'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/data-sync-rest/objectStatus':
+    get:
+      tags:
+        - Sync
+      summary: Get Object Sync status
+      description: |
+        Used to get sync status for objects of particular tranformation by using transformation id.
+        Using this sync status, the user can identify whether a particular object's sync is in progress, completed, or failed.
+        Object sync status includes object id, sync status of the object, etc.
+        Object sync status is fetched in the logs page in the app to display the progress of the entity sync.
+        For example,
+        The object id is 48009982158 and its sync status is "INPROGRESS"
+      operationId: getObjectSyncStatus
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: transformationId
+          description: Unique identifier of the transformation
+          type: integer
+          format: int64
+          required: true
+        - in: query
+          name: page
+          description: Page number to be fetched
+          type: integer
+          format: int64
+          required: false
+        - in: query
+          name: per_page
+          description: Page size parameter
+          type: integer
+          format: int64
+          required: false
+      responses:
+        '200':
+          description: Log details
+          schema:
+            $ref: '#/definitions/PaginatedObjectStatusList'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+  '/integration-rest/backendApps':
+    post:
+      tags:
+        - Integration
+      summary: Install Backend App
+      description: |
+        Install backend app to listen to product events and send them as external events to the given webhook.
+      operationId: installBackendApp
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: backendApp
+          description: The backend app payload
+          schema:
+            $ref: '#/definitions/BackendApp'
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/BackendApp'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      tags:
+        - Integration
+      summary: Update Backend App
+      description: |
+        Update backend app to listen to product events and send them as external events to the given webhook.
+      operationId: updateBackendApp
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: backendApp
+          description: The backend app payload
+          schema:
+            $ref: '#/definitions/BackendApp'
+      responses:
+        '200':
+          description: Updated
+          schema:
+            $ref: '#/definitions/BackendApp'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      tags:
+        - Integration
+      summary: Delete Backend App
+      description: |
+        Delete backend app that was installed to listen to product events and send them as external events to the given webhook.
+      operationId: uninstallBackendApp
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: backendApp
+          description: The backend app payload
+          schema:
+            $ref: '#/definitions/BackendApp'
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: UnAuthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Server Not Found
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal Server error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  BackendApp:
+    type: object
+    properties:
+      appuuid:
+        description: Unique identifier of the app
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+      webhookUrl:
+        description: |
+          The URL to pass on the payload of the product's events. 
+          Listened as external events in the native app for event sync.
+        type: string
+      domain:
+        description: Domain of the account to install the app
+        type: string
+        example: ipaasstest100.freshsales.io
+      apiKey:
+        description: API key for the authentication of the app creation in the account
+        type: string
+        example: xxxxxxxxxxxx
+      entitiesToPublishEvent:
+        description: List of entities for which the product event have to be published
+        type: array
+        items:
+          type: string
+  ObjectSyncStatus:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Unique identifier of the Object Sync Status
+        example: 1
+      transformationId:
+        type: integer
+        description: Unique identifier of the Transformation
+        example: 1
+      objectId:
+        type: string
+        description: Unique identifier of objects in either of the entity in the transformation
+        example: 76253hbk76t4356
+      schemaId:
+        type: integer
+        description: Unique identifier of the Schema
+        example: 1
+      nonce:
+        type: integer
+        description: Nonce
+        example: 1
+      status:
+        type: string
+      hmac:
+        type: string
+      updatedAt:
+        type: string
+        format: date
+      errorDescription:
+        type: string
+        description: TBD
+        example:
+  MappingList:
+    type: array
+    items:
+      $ref: '#/definitions/Mapping'
+  AccountAppDetails:
+    description: Contains the account and app details of an app
+    type: object
+    properties:
+      id:
+        description: Unique Identifier for App details
+        type: integer
+        format: int64
+        readOnly: true
+        example: 1
+      appuuid:
+        description: Unique identifier of the app
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+      details:
+        description: The details specific to the app<->account combination stored in IPaaS. Used for configuring] the app.
+        type: object
+        additionalProperties:
+          type: string
+        example: {"name": "Nancy", "emailId": "nancy@freshworks.com"}
+  LogObject:
+    description: |
+      The log object describing the status of the sync at object-level for any transformation created in the integration. Contains all the meta information of the sync run between any two entities(objects) in a transformation. 
+    type: object
+    properties:
+      id:
+        description: Unique identifier of a Log
+        type: integer
+        format: int64
+        example: 1
+        readOnly: true
+      transformationId:
+        description: Unique identifier of a Transformation
+        type: integer
+        format: int64
+        example: 1
+      platformStatusCode:
+        description: A platform specific status code for depicting the sync's status
+        type: integer
+        format: int64
+        example: 200
+      platformMessage:
+        description: A platform specific message for depicting the sync's status
+        type: string
+        example: The sync is successful
+      vendorStatusCode:
+        description: The response status code captured from the destination connector when sync was carried out
+        type: integer
+        format: int64
+        example: 201
+      vendorMessage:
+        description: The response message captured from the destination connector when sync was carried out
+        type: string
+        example: Created
+      sourcePayload:
+        description: Payload of source object - the delta change in the object
+        type: object
+        additionalProperties:
+          type: object
+        example: 
+          last_name: ipaastest1593155421
+          email: ipaastest1593155421@ipaastest.com
+      destinationPayload:
+        description: Payload of destination object - the delta change in the object
+        type: object
+        additionalProperties:
+          type: object
+        example: 
+          first_name: ipaastest1593495002
+          last_name: ipaastest1593495002
+          email: ipaastest1593495002@ipaastest.com
+          id: 1421561
+      srcObjectId:
+        description: Internal Identifier for objects in the source entity in the sync
+        type: string
+        example: 2352383
+      destObjectId:
+        description: Internal Identifier for objects in the destination entity in the sync
+        type: string
+        example: 2352369
+      createdAt:
+        description: Created Date and Time of the logs
+        type: string
+        format: date
+        readOnly: true
+      operation:
+        description: The operation done on the destination object in the sync
+        type: string
+        enum:
+          - CREATE
+          - UPDATE
+          - DELETE
+          - INPROGRESS
+        example: CREATE
+  LogObjectList:
+    description: A list of log objects
+    type: array
+    items:
+          $ref: '#/definitions/LogObject'
+  BulkSyncRequest:
+    description: The Bulk Sync Payload
+    type: object
+    properties:
+      callback:
+        description: |
+          The callback URI to do a POST call on the completion of the bulk sync.
+        type: string
+        minimum: 1
+        example: "http://127.0.1.1:8080/testBulk"
+      syncRequests:
+        description: Contains list of Sync requests
+        type: array
+        items:
+          $ref: '#/definitions/SyncRequest'
+  SyncRequest:
+    description: The sync request payload containing meta details like - integration, conector and schema, and the event payload for the sync.
+    type: object
+    properties:
+      integrationId:
+        description: Unique identifier of a Integration
+        type: integer
+        format: int64
+        minimum: 1
+        example: 1
+      connectorId:
+        description: Unique identifier of a Connector
+        type: integer
+        format: int64
+        minimum: 1
+        example: 1
+      schemaId:
+        description: Unique identifier of a Schema
+        type: integer
+        format: int64
+        minimum: 1
+        example: 1
+      nonce:
+        description: A timestamp track of the sync in the system
+        type: integer
+        format: int64
+        minimum: 1
+        example: 1
+      payload:
+        description: |
+          The Sync payload - the changes in the values in the various fields of the particular schema of the connector. The event payload must be a key-value pair of the field and the change in its value from the event.
+        type: object
+        minimum: 1
+        additionalProperties:
+          type: object
+        example: {"first_name": "ipaastest1592985123", "last_name": "ipaastest1592985123",
+                  "email": "ipaastest1592985123@ipaastest.com", "id": "1592985123"}
+  FieldMeta:
+    properties:
+      name:
+        type: string
+        description: Name of the field in the destination schema
+        example: phone_number
+      type:
+        type: string
+        description: Type of the mapping of the particular field
+        example: string
+        enum:
+          - expression
+          - field
+      options:
+        type: object
+  FormServMapping:
+    type: object
+    description: |
+      The mapping payload from the tranformation's mapping save
+    properties:
+      mapping:
+        description: |
+          Contains mappings between the source and the destination fields 
+          - Can be either field to field (or)
+          - JS Expressions 
+        type: object
+        additionalProperties:
+          type: string
+      meta:
+        type: array
+        description: It is metadata of the mapping from UI. It is used to identify whether the mapping is field to field or expression. Contains the list of all the expression fields, the rest are conidered to have field-to-field mappings.
+        items:
+          $ref: '#/definitions/FieldMeta'
+      transformationId:
+        description: Unique identifier of a Transformation
+        type: integer
+        format: int64
+        example: 1
+      sourceSchemaId:
+        description: Unique identifier of a Source schema
+        type: integer
+        format: int64
+        example: 1
+      destinationSchemaId:
+        description: Unique identifier of a Destination schema
+        type: integer
+        format: int64
+        example: 1
+      integrationId:
+        description: Unique identifier of a Integration
+        type: integer
+        format: int64
+        example: 1
+      groupId:
+        description: Group to which an Integration belongs to.
+        type: integer
+        format: int64
+        example: 1
+  Mapping:
+    description: |
+      Mapping is the actual conversion logic that has to be applied to convert the source schema to destination schema. Mapping UI will be provided where the users can have
+      - field to field mappings
+      - custom js scripts
+    type: object
+    properties:
+      id:
+        description: Unique identifier of a Mapping
+        type: integer
+        format: int64
+        readOnly: true
+        example: 1
+      sourceSchemaId:
+        description: Source schema identifier 
+        type: integer
+        format: int64
+        minimum: 1
+        example: 1
+      destinationSchemaId:
+        description: Destination schema identifier
+        type: integer
+        format: int64
+        minimum: 1
+        example: 1
+      sourceEntityType:
+        description: Source entity type is the actual source entity name which is passed to backend
+        type: string
+        example: Contacts
+      destinationEntityType:
+        description: Destination entity type is the actual destination entity name which is passed to backend
+        type: string
+        example: Lead
+      sourceEntityName:
+        description: Name of source entity for user display
+        type: string
+        example: Contacts
+      destinationEntityName:
+        description: Name of the destination entity for user display
+        type: string
+        example: Lead
+      integrationId:
+        description: Unique identifier of integration
+        type: integer
+        format: int64
+        minimum: 1
+        example: 1
+      groupId:
+        description: Transformation Group Identifier
+        type: integer
+        format: int64
+        minimum: 1
+        example: 1
+      mappingDirection:
+        description: Direction for mapping between the fields
+        type: string
+        default: "AtoB"
+        example: "AtoB"
+      overwritten:
+        description: To specify if the mapping needs to be overwritten
+        type: boolean
+        default: false
+      mapping:
+        description: The field-field mapping
+        type: array
+        items:
+          $ref: '#/definitions/FieldMap'
+  FieldMap:
+    type: object
+    description: Enables users to populate the value for a field of the entity. The value can be populated in two ways
+      - copy of the value of a field of another entity
+      - a js expression that returns the value to be assigned
+    properties:
+      sourceField:
+        description: Name of the field that belongs to the source for mapping
+        type: string
+        example: email
+      destinationField:
+        description: Name of the field that belongs to the destination for mapping
+        type: string
+        minimum: 1
+        example: emailId
+      sourceFieldType:
+        description: Data type of the Source field which you have selected for mapping
+        type: string
+        enum:
+          - object
+          - string
+          - number
+          - boolean
+        minimum: 1
+        example: string
+      destinationFieldType:
+        description: Data type of the destination field which you have selected for mapping
+        type: string
+        enum:
+          - object
+          - string
+          - number
+          - boolean
+        minimum: 1
+        example: string
+      mappingType:
+        description: Type of mapping
+        type: string
+        enum:
+          - field_to_field
+          - expression
+        minimum: 1
+        example: expression
+      expression:
+        description: The details of expression field is given as js expression that returns the value to be assigned when your mapping type is expression
+        type: object
+        additionalProperties:
+          type: object
+  MatchingSettings:
+    description: |
+      Defines the field(s) used as the matching criteria for any entity. The field(s) specified are used to identify the objects that match in both the source and the destination schemas.
+    type: object
+    properties:
+      id:
+        description: Unique identifier of a MatchingSettings
+        type: integer
+        format: int64
+        example: 1
+        readOnly: true
+      schemaId:
+        description: Unique identifier of the Schema
+        type: integer
+        format: int64
+        example: 1
+      transformationGroupId:
+        description: Unique identifier of the transformationGroup
+        type: integer
+        format: int64
+        example: 1
+      fields:
+        description: |
+          The list of fields in the schema that are used in the matching of the objects between the two schemas in the transformationGroup.
+        type: array
+        items:
+          type: string
+  MappingForm:
+    type: object
+    properties:
+      sourceSchemaId:
+        type: integer
+        description: The schema id of the source entity
+        example: 1
+      destinationSchemaId:
+        type: integer
+        description: The schema id of the destinetion entity
+        example: 1
+      sourceConnectorId:
+        type: integer
+        description: The schema id of the source connector
+        example: 1
+      destinationConnectorId:
+        type: integer
+        description: The schema id of the destination connector
+        example: 1
+      sourceSchemaName:
+        type: string
+        description: The name of the source schema
+        example: lead
+      destinationSchemaName:
+        type: string
+        description: The name of the destination schema
+        example: contact
+      appuuid:
+        type: string
+        description: Identifier to denote the app to which the form belongs to
+        example: 123e4567-e89b-12d3-a456-426614174000
+      isExpressionForm:
+        type: boolean
+        description: |
+          To indicate whether the form is a transformation form or the Expression form for adding textareas for using expressions in mappings.       
+            true - create Expression Form
+            false - create Mapping Form
+        example: true
+  ClearCollisionRequest:
+    type: object
+    properties:
+      masterConnectorId:
+        type: integer
+        description: TBD
+        example: 1
+      transformationId:
+        type: integer
+        description: TBD
+        example: 1
+      objectId:
+        type: string
+        description: TBD
+        example: Xfjed343  
+  SchemaList:
+    type: array
+    items:
+      $ref: '#/definitions/Schema'
+  ValueOption:
+    properties:
+      name:
+        description: Name for the option field - key
+        type: string
+        example: Name
+      value:
+        description: Json value for the option field
+        type: object
+        example: name
+  Property:
+    properties:
+      name:
+        description: Name of field is the actual name of the field which is passed to the backend
+        type: string
+        example: first_name
+        minimum: 1
+      label:
+        description: Label of the field for user display
+        type: string
+        minimum: 1
+        example: First Name
+      type:
+        description: Data type of the field
+        type: string
+        enum:
+          - array
+          - object
+          - string
+          - integer
+          - number
+          - boolean
+        example: string
+      readOnly:
+        description: Whether field is readOnly
+        type: boolean
+        example: false
+      options:
+        description: |
+          The key and value pair of the option settings
+        type: array
+        items:
+          $ref: '#/definitions/ValueOption'
+      required:
+        description: Is the field required or optional
+        type: boolean
+        example: true
+      properties:
+        type: array
+        items:
+          $ref: '#/definitions/Property'
+    required:
+      - name
+      - label
+      - required
+      - type
+  Schema:
+    description: The meta data of the entity used in the integration.
+    type: object
+    properties:
+      properties:
+        description: List of fields of the entity
+        type: array
+        minimum: 1
+        items:
+          $ref: '#/definitions/Property'
+      entityType:
+        description: Entity name used for the backend identification
+        type: string
+        example: contact
+      entityName:
+        description: Name of Entity for user display
+        type: string
+        example: Contact
+      responseEntityName:
+        description: name of the entity
+        type: string
+        example: contact
+      id:
+        description: Unique identifier of a EntityMetaRequest
+        type: integer
+        format: int64
+        readOnly: true
+        example: 1
+      entityIdColumn:
+        description: The unique identifier of the entity
+        type: string
+        example: id
+      entityCreateEndpointUrl:
+        description: Relative endpoint for the entity creation
+        type: string
+        example: /api/contacts
+      entityUpdateEndpointUrl:
+        description: Relative endpoint for the entity updation
+        type: string
+        example: /api/contacts/{id}
+      schemaEndpointUrl:
+        description: Relative endpoint to fetch the schema of an entity
+        type: string
+        example: /api/v2/employee_fields
+      connectorId:
+        description: Connector to which the schema belongs to
+        type: integer
+        example: 1
+      entityUpdateHttpMethod:
+        description: The httpMethod used for updating the entity for the particular schema of the connector
+        type: string
+        enum:
+          - PUT
+          - PATCH
+        example: PUT
+      isFetchAfterCreate:
+        type: boolean
+        description: Set to true for connectors which do not return the created entity in the response body after a successful POST request
+        example: false
+  Connector:
+    type: object
+    description: Connector stores information about the source/destination domains. For example, if the domain is test.freshdesk.com then the connector will store the the domain name, API key, account id, status (connected or not), etc.,
+    properties:
+      id:
+        description: Unique identifier of a Connector
+        type: integer
+        format: int64
+        readOnly: true
+        example: 1
+      displayName:
+        description: Connector's display name for the user
+        type: string
+        example: Freshdesk
+      accountId:
+        description: Unique identifier for an account in the platform. An id is assigned to (vendor account id, product) combination
+        type: integer
+        format: int64
+        example: 1
+      status:
+        description: The connection status for the connector
+        type: string
+        enum:
+        - NEW
+        - CONNECTED
+        - DISCONNECTED
+        example: CONNECTED
+      details:
+        description: |
+          The details field is a JSON string with the following details of the connector
+          domain* - <domain of the connector> e.g. https://testemailuniqueremovalmodified.fsales.io
+          healthCheckPath* - <the health check path for the connector to check if the auth details are valid> 
+          expectedStatusCode* - <the expected status code for the health check endpoint>
+          authType* - <the authentication mechanism used for the APIs of the conector> Can be one of the following - basic, bearer, auth_header, oauth, oauth2
+          username - <authentication parameter depending on the type of the authentication>
+          password - <authentication parameter depending on the type of the authentication>
+          token - <authentication parameter depending on the type of the authentication>
+        type: object
+        properties:
+            domain:
+                description: The domain of the account whose content has be synched
+                type: string
+                example: test.freshdesk.com
+            healthCheckPath:
+                description: The rest endpoint to which an API call must be made to check if the domain is healthy.
+                type: string
+                example: /api/v2/contacts
+            expectedStatusCode:
+                description: The http response code that is expected if the domain is healthy on making a call to healthCheckPath.
+                type: integer
+                format: int64
+                example: 200
+            authType:
+                description: The type of authentication to be used to connect to the domain.
+                type: string
+                enum:
+                - basic
+                - bearer
+                - auth_header
+                - oauth2
+                example: basic
+            token:
+                description: The value of the bearer token to be used if the auth_type is bearer.
+                type: string
+                example: Xeftgjkmbsdaijaddksd
+            username:
+                description: The name of the user in case auth_type is basic.
+                type: string
+                example: test@freshworks.com
+            password:
+                description: The password of the user in case auth_type is basic.
+                type: string
+                example: thisispassword
+            isSkipHealthCheck:
+                description: Set this to skip the health check, however, this is not recommended.
+                type: boolean
+                default: false
+            platformOAuthConfig:
+                type: object
+                properties:
+                    responseType:
+                        type: string
+                        description: TBD.
+                        example: 
+                    authEndpoint:
+                        type: string
+                        description: The authorization endpoint of the oauth2 provider
+                        example: https://login.salesforce.com/services/oauth2/authorize
+                    tokenEndpoint:
+                        type: string
+                        description: The endpoint the provides the refresh and access tokens.
+                        example: https://login.salesforce.com/services/oauth2/token
+                    clientId:
+                        type: string
+                        description: The id of the client registered as a app with the oauth2 provider
+                        example: 3MVG97quAmFZJfVzeJ0M0u.CYZ.qnX
+                    clientSecret:
+                        type: string
+                        description: The secret given by the oauth2 provider for the registered client
+                        example: 3MVG97quAmFZJfVzeJ0M0u
+                    redirectUrl:
+                        type: string
+                        description: The url to which the app must be redirected after user has given permissions for the oauth2 app
+                        example: https://test.com/oauth2Redirect
+                    scopes:
+                        type: string
+                        description: The permissions that have to be obtained by the client to perform the sync.
+                        example: 'api refresh_token'
+                    refreshToken:
+                        type: string
+                        description: The token used to obtain a new access token when the existing token expires
+                        example: ref3MVG97quAmFZJfVzeJ0M0uresh 
+                    tokenType:
+                        type: string
+                        description: TBD
+                        example: 
+                    providerUrl:
+                        type: string
+                        description: The oauth2 provider url constructed using the oauth2 params.
+                        example: TBD
+            useSoapProtocol:
+                type: boolean
+                description: This should be set to true if SOAP protocol is used instead of REST.
+                example: true
+            soapMsgParseParams:
+                type: object
+                properties:
+                    responseXpath:
+                        type: string
+                        description: The xpath in the response xml from which the response must be read
+                        example: 'JobsResponse.JobResponse'
+                    statusXpath:
+                        type: string
+                        description: The xpath relative to the responseXpath that contains the status details.
+                        example: 'Status.ReturnCode.@returnCodeType'
+                    successCode:
+                        type: string
+                        description: The return value to be check if the API is successful.
+                        example: 'success'
+                    idPath:
+                        type: string
+                        description: The path where the 'id' field will be present relative to responseXpath
+                        example: 'JobReference.@jobRefCode'
+  Account:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Unique identifier of IPaaS account
+        readOnly: true
+        example: 1
+      createdAt:
+        type: string
+        format: date
+        description: Timestamp of the account creation
+        example: '2020-02-27Z09:00'
+      updatedAt:
+        type: string
+        format: date
+        description: Timestamp of the account's last updation
+        example: '2020-02-27Z09:00'
+      vendorAccountId:
+        description: Name of the source product in which the sync app has been installed to sync with destination product
+        type: integer
+        example: 1
+      product:
+        description: Name of the source product in which the sync app has been installed to sync with destination product
+        type: string
+        x-enum:
+          - FRESHSALES
+          - FRESHDESK
+          - FRESHSERVICE
+          - FRESHTEAM
+  ObjectReferences:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Unique Identifier of an Object Reference
+        readOnly: true
+        example: 1
+      transformationGroupId:
+        type: integer
+        description: Unique Identifier of a transformation group
+        readOnly: true
+        example: 1
+      objectId:
+        type: string
+        description: Unique Identifier of an object in sync
+        readOnly: true
+        example: 1
+      schemaId:
+        type: integer
+        description: Unique identifier of Schema
+        readOnly: true
+        example: 1
+      matchingValue:
+        type: string
+        description: The matching value used in the transformation of the object belonging to the given schema in the transformation
+        readOnly: true
+        example: 1
+  ObjectReferenceList:
+    type: array
+    items:
+      $ref: '#/definitions/ObjectReferences'
+  IntegrationList:
+    type: array
+    items:
+      $ref: '#/definitions/Integration'
+  Integration:
+    type: object
+    description: Integration is a top-level object that holds the information about all the conversions that are available for an account. An account can have multiple integrations.
+    properties:
+      id:
+        description: Unique identifier of Integration
+        type: integer
+        format: int64
+        readOnly: true
+        example: 1
+      sourceConnectorId:
+        description: Unique identifier of Source Connector
+        type: integer
+        format: int64
+        readOnly: true
+        example: 1
+      destinationConnectorId:
+        description: Unique identifier of Destination Connector
+        type: integer
+        format: int64
+        readOnly: true
+        example: 1
+      createdAt:
+        description: Date and time of Integration created
+        type: string
+        readOnly: true
+        format: date
+      updatedAt:
+        description: Date and time of Integration updated
+        type: string
+        readOnly: true
+        format: date
+  Form:
+    type: object
+    properties:
+      id:
+        description: Unique Identifier of the form
+        type: integer
+        format: int64
+        readOnly: true
+        example: 1
+      appuuid:
+        description: Unique Identifier of the app to which the form belongs to
+        type: string
+        example: 123e4567-e89b-12e3-a456-426614174000
+      name:
+        description: Name of the form
+        type: string
+        example: connect
+      formId:
+        description: UUID of the formServObject
+        type: string
+        readOnly: true
+        example: 123e4567-e89b-12d3-a456-426614174000
+      formServObject:
+        $ref: '#/definitions/FormServObject'
+  FormServObject:
+    description: The form object containing the meta and the fileds it contains
+    type: object
+    properties:
+      docId:
+        description: UUID of the formServObject
+        type: string
+        readOnly: true
+        example: 123e4567-e89b-12d3-a456-426614174000
+      fields:
+        type: array
+        items:
+          $ref: '#/definitions/FormServField'
+      version:
+        description: Version of the formServObject
+        type: string
+        example: 1
+      form_options:
+        type: object
+        description: Stores multiple configurations supported by the service. Also supports custom configurations required by the apps
+  FormServField:
+    type: object
+    properties:
+      id:
+        description: Unique Identifier of a field
+        type: string
+        readOnly: true
+        example: 123e4567-e89b-12d3-a456-426614174000
+      name:
+        description: |
+          Internal name for the field. This value is used to represent the name of the HTML tags when the form is renderred in the UI.
+        type: string
+        example: domain
+      label:
+        description: |
+          The UI specific name for the field. This value gets renderred as a Label when the form is renderred in the UI.
+        type: string
+        example: Domain
+      type:
+        description: Datatype of the field
+        type: integer
+        example: 1
+      editable:
+        description: To indicate if the field is editable or not
+        type: boolean
+        default: true
+        example: true
+      position:
+        description: The position of the field in the form
+        type: integer
+        format: int64
+        default: 1
+        example: 1
+      visible:
+        description: To indicate if the field should be visible in the UI or stay hidden
+        type: boolean
+        default: true
+        example: true
+      fields:
+        description: The nested fields if the field is a section
+        type: array
+        items:
+          $ref: '#/definitions/FormServField'
+      choices:
+        type: array
+        items:
+          $ref: '#/definitions/Choice'
+      required:
+        type: boolean
+        description: To indicate if the field is required for the form submit or not
+        default: false
+        example: true
+      field_optins:
+        description: |
+          Contains configurations for the specific field 
+        type: object
+        properties:
+          option_label_path:
+            type: string
+            description: |
+              To specify which of the property's value in the field needs to be displayed in the UI for the user if the field is a dropdown field - used purely for UI representation of the Field.
+            example: value
+          option_value_path:
+            type: string
+            description: |
+              To specify which of the property's value in the field needs to be returned when the choice is selected in the dropdown - used for internal identification of the choice which is selected.
+            example: internal_name
+  Choice:
+    description: contains list of choice objects
+    type: object
+    properties:
+      id:
+        description: Unique identifier of choice
+        type: string
+        readOnly: true
+        example: 123e4567-e89b-12d3-a456-426614174000
+      value:
+        description: |
+          Label for the choice. This value gets displayed in the dropdown for the user to choose from.
+        type: string
+        example: Status
+      internal_name:
+        description: |
+          The name for the choice field HTML tag. This value is used as the name in the HTML tag for internal reference to the field being mapped.
+        type: string
+        example: status_field
+      position:
+        description: position of the choice in the dropdown
+        type: integer
+        default: 1
+        format: int64
+        example: 1
+  PaginationMeta:
+    type: object
+    properties:
+      self:
+        type: string
+        description: URI made by the current request
+        example: 'http://stage-v2.pipestage.com/data-sync-rest?transformationId=1&page=2&per_page=10'
+      next:
+        type: string
+        description: URI for fetching the next page conforming to the search made by the request
+        example: 'http://stage-v2.pipestage.com/data-sync-rest?transformationId=1&page=3&per_page=10'
+      previous:
+        type: string
+        description: URI for fetching the previous page conforming to the search made by the request
+        example: 'http://stage-v2.pipestage.com/data-sync-rest?transformationId=1&page=1&per_page=10'
+      total_items:
+        type: integer
+        description: Total items found in the search
+        example: 100
+      total_pages:
+        type: integer
+        description: Total pages found in the search
+        example: 10
+  ObjectSyncStatusList:
+    type: array
+    items:
+      $ref: '#/definitions/ObjectSyncStatus' 
+  PaginatedObjectStatusList:
+    type: object
+    properties:
+      sync_statuses:
+        type: array
+        items:
+          $ref: '#/definitions/ObjectSyncStatus'
+      meta:
+          $ref: '#/definitions/PaginationMeta'
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Type of the error
+        example: Some user friendly error message 
+  DeleteTransformationPayload:
+    type: object
+    properties:
+      source_entity:
+        type: string
+        example: fd_contact
+      destination_entity:
+        type: string
+        example: fs_contact
+  UpdateConnectorPayload:
+    type: object
+    properties:
+      integrations:
+        type: array
+        items:
+          $ref: '#/definitions/Integration'
+      domain:
+        type: string
+      token:
+        type: string
+        description: Token in case of auth_type as bearer, oauth2 and username in case of basic
+      healthCheckPath:
+        type: string
+      expectedStatusCode:
+        type: string
+      authType:
+        type: string
+      password:
+        type: string
+      isSource:
+        type: boolean
+      isOauthRegister:
+        type: boolean
+      oauth_details:
+        type: object
+        properties:
+          clientId:
+            type: string
+            example: 7fff1e36-2d40-4ae1-bbb1-5266d59564fb
+          clientSecret:
+            type: string
+            example: 7fff1e36-2d40-4ae1-bbb1-5266d59564fb
+          scopes:
+            type: string
+            example: contacts
+          authEndpoint:
+            type: string
+          tokenEndpoint:
+            type: string
+
+  CreateSchemaPayload:
+    allOf:
+      - $ref: '#/definitions/Schema'
+      - type: object
+        properties:
+          entity:
+            type: string
+      - type: object
+        properties:
+          connector:
+            type: object
+            allOf:
+              - $ref: '#/definitions/Connector'
+              - type: object
+                properties:
+                  name:
+                    type: string
+  CreateMatchingSettingsPayload:
+    type: object
+    properties:
+      transformation_group_id:
+        type: integer
+      source_schema_id:
+        type: integer
+      destination_schema_id:
+        type: integer
+      source_fields:
+        type: array
+        items:
+            type: string
+      destination_fields:
+        type: array
+        items: 
+          type: string
+  CreateTransformationPagePayload:
+    type: object
+    properties:
+      source_entity:
+        type: string
+        example: fd_contact
+      destination_entity:
+        type: string
+        example: fs_contact
+      isExpressionForm:
+        type: boolean
+  SaveMappingPayload:
+    type: object
+    properties:
+      src_entity:
+        type: string
+      dest_entity:
+        type: string
+      mapping:
+        description: The field-field mapping
+        type: array
+        items:
+          $ref: '#/definitions/FieldMap'
+      expr_field_meta:
+        type: object

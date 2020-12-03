@@ -1,0 +1,6 @@
+{
+    "usePromises" : "true",
+    "emitModelMethods": "true",
+    "projectVersion": "0.0.2-beta-79",
+    "projectName": "ipaas-sync"
+}

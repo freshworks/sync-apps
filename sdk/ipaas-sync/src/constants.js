@@ -1,0 +1,22 @@
+module.exports = Object.freeze({
+    DOMAIN_LABEL: "Domain",
+    API_KEY_LABEL: "API Key",
+    DOMAIN: "domain",
+    TOKEN: "token",
+    CREATED: "created",
+    SOURCE_CONNECTOR_FORM: "connectSourceForm",
+    FORM_ACTION: "form_action",
+    DESTINATION_CONNECTOR_FORM: "connectDestinationForm",
+    REQUEST_PROCESS_ERROR_MESSAGE: "<div>Unable to process request. Please contact support.</div>",
+    SOURCE_CONNECTOR_CALLBACK: "javascript:updateSourceConnector()",
+    DESTINATION_CONNECTOR_CALLBACK: "javascript:updateDestinationConnector()",
+    TRANSFORMATION_SELECTION_FORM: "transformationSelectForm",
+    FRESHDESK: "FRESHDESK",
+    FRESHSALES: "FRESHSALES",
+    MAILCHIMP: "MAILCHIMP",
+    HUBSPOT: "HUBSPOT",
+    FRESHTEAM: "FRESHTEAM",
+    FRESHSERVICE: "FRESHSERVICE",
+    SALESFORCE: "SALESFORCE",
+    CONNECT_FORM_SUPPORTED_PRODUCTS: ["FRESHDESK", "FRESHSALES", "HUBSPOT"]
+});

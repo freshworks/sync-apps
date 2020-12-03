@@ -1,0 +1,143 @@
+{{>licenseInfo}}
+
+var ApiClient = require('./ApiClient');
+var Converter = require('./converter/converter');
+var Service = require('./service/service');
+var Constants = require('./constants');
+{{#models}}var {{#model}}{{classFilename}}{{/model}} = require('./{{#modelPackage}}{{modelPackage}}/{{/modelPackage}}{{importPath}}');
+{{/models}}{{#apiInfo}}{{#apis}}var {{importPath}} = require('./{{#apiPackage}}{{apiPackage}}/{{/apiPackage}}{{importPath}}');
+{{/apis}}{{/apiInfo}}
+
+{{#emitJSDoc}}/**{{#projectDescription}}
+* {{projectDescription}}.<br>{{/projectDescription}}
+* The <code>index</code> module provides access to constructors for all the classes which comprise the public API.
+* <p>
+* An AMD (recommended!) or CommonJS application will generally do something equivalent to the following:
+* <pre>
+* var {{moduleName}} = require('{{#invokerPackage}}{{invokerPackage}}/{{/invokerPackage}}index'); // See note below*.
+* var xxxSvc = new {{moduleName}}.XxxApi(); // Allocate the API class we're going to use.
+* var yyyModel = new {{moduleName}}.Yyy(); // Construct a model instance.
+* yyyModel.someProperty = 'someValue';
+* ...
+* var zzz = xxxSvc.doSomething(yyyModel); // Invoke the service.
+* ...
+* </pre>
+* <em>*NOTE: For a top-level AMD script, use require(['{{#invokerPackage}}{{invokerPackage}}/{{/invokerPackage}}index'], function(){...})
+* and put the application logic within the callback function.</em>
+* </p>
+* <p>
+* A non-AMD browser application (discouraged) might do something like this:
+* <pre>
+* var xxxSvc = new {{moduleName}}.XxxApi(); // Allocate the API class we're going to use.
+* var yyy = new {{moduleName}}.Yyy(); // Construct a model instance.
+* yyyModel.someProperty = 'someValue';
+* ...
+* var zzz = xxxSvc.doSomething(yyyModel); // Invoke the service.
+* ...
+* </pre>
+* </p>
+* @module {{#invokerPackage}}{{invokerPackage}}/{{/invokerPackage}}index
+* @version {{projectVersion}}
+*/{{/emitJSDoc}}
+module.exports = {
+    {{=< >=}}
+    /**
+     * The Converter package 
+     * contains converters for the following connectors:
+     * 1. Freshsales - contact, lead, account
+     * 2. Freshdesk - contact, company
+     * 3. MailChimp - member
+     * 4. Hubspot - contact
+     * 5. Freshteam - employee
+     * 6. Freshservice - requester
+     */
+    Converter,
+
+    /**
+    * The App class for building a new instance of the app
+    * contains details of the installation
+    */
+    App: Service.App,
+
+    /**
+    * To fetch the HTML form given the form's name
+    * @param {String} name 
+    */
+    getForm: Service.IntegrationService.getForm,
+
+    /**
+    * Get all the integrations for the vendorAccountId and product pair
+    *  - Try fetching the integrations from the /details endpoint if present
+    *  - If not, then fetch them using the GET /integrations
+    */
+    getIntegrations: Service.IntegrationService.getIntegrations,
+
+    /**
+    * Get details for the connectors in the integration
+    */
+    getConnectorDetails: Service.ConnectorService.getConnectorDetails,
+
+    getConnector: Service.ConnectorService.getConnector,
+    
+    /**
+    * Update Connector details for a connector
+    */
+    updateConnector: Service.ConnectorService.updateConnector,
+
+    createSchema: Service.SchemaService.createSchema,
+
+    createMapping: Service.TransformationService.createMapping,
+
+    createMatchingSettings: Service.MatchingService.createMatchingSettings,
+
+    createTransformationPage: Service.TransformationService.createTransformationPage,
+
+    getMappingData: Service.TransformationService.getMappingData,
+
+    saveMapping: Service.TransformationService.saveMapping,
+    
+    getTransformationDetails: Service.TransformationService.getTransformationDetails,
+
+    deleteTransformation: Service.TransformationService.deleteTransformation,
+
+    getMappingUI: Service.TransformationService.getMappingUI,
+
+    checkInitialSyncRequired: Service.LogService.checkInitialSyncRequired,
+
+    checkLogsPageRequired: Service.LogService.checkLogsPageRequired,
+
+    updateFreshsalesViewIds: Service.FreshsalesService.updateFreshsalesViewIds,
+
+    getObjectSyncStatus: Service.SyncService.getObjectSyncStatus,
+
+    initialSync: Service.SyncService.initialSync,
+
+    initialSyncCallBack: Service.SyncService.initialSyncCallBack,
+
+    setKey: Service.IntegrationService.setKey,
+
+    deleteAppDetails: Service.IntegrationService.deleteAppDetails,
+    
+    installBackendApp: Service.IntegrationService.installBackendApp,
+
+    CONSTANTS: Constants,
+    
+    <#emitJSDoc>/**
+     * The ApiClient constructor.
+     * @property {module:<#invokerPackage><invokerPackage>/</invokerPackage>ApiClient}
+     */</emitJSDoc>
+    ApiClient<#models>,
+
+    <#emitJSDoc>/**
+     * The <importPath> model constructor.
+     * @property {module:<#invokerPackage><invokerPackage>/</invokerPackage><#modelPackage><modelPackage>/</modelPackage><importPath>}
+     */</emitJSDoc>
+    <importPath></models><#apiInfo><#apis>,
+
+    <#emitJSDoc>/**
+    * The <importPath> service constructor.
+    * @property {module:<#invokerPackage><invokerPackage>/</invokerPackage><#apiPackage><apiPackage>/</apiPackage><importPath>}
+    */</emitJSDoc>
+    <importPath></apis></apiInfo>
+
+};<={{ }}=>
