@@ -467,6 +467,7 @@ class ApiClient {
         // Adding the default headers
         headers["vendorAccountId"] = this.vendorAccountId;
         headers["product"] = this.product;
+        headers[this.httpConstants.CONTENT_TYPE] = this.httpConstants.JSON;
 
         // apply authentications
         // this.applyAuthToRequest(request, authNames);
