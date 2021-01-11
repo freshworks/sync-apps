@@ -1,5 +1,6 @@
 {{>licenseInfo}}
 
+var superagent = require("superagent");
 var querystring = require("querystring");
 
 {{#emitJSDoc}}/**
@@ -54,12 +55,6 @@ class ApiClient {
         this.defaultHeaders = {};
 
         /**
-         * The request object for the API calls
-         * the $request is set to this object
-         */
-        this.request = null;
-
-        /**
         * The vendorAccountId of the product in which the app is installed
         */
         this.vendorAccountId = null;
@@ -103,15 +98,6 @@ class ApiClient {
         }
 
         return param.toString();
-    }
-
-    {{#emitJSDoc}}/**
-     * Setting the request object for making API calls
-     * the $request object is passed here
-     * @param {Request} requestObject 
-     */{{/emitJSDoc}}
-    setRequest(requestObject) {
-        this.request = requestObject;
     }
 
     {{#emitJSDoc}}/**
@@ -371,49 +357,63 @@ class ApiClient {
         return ApiClient.convertToType(data, returnType);
     }
 
-    {{#emitJSDoc}}
     /**
-     * Construct headers map from the headerParams, contentTypes and the accepts, and return it
-     * @param {Object.<String, String>} headerParams 
-     * @param {Array.String} contentTypes 
-     * @param {Array.String} accepts 
+     * Make API calls from converters
+     * @param {String} path The base URL to invoke.
+     * @param {String} httpMethod The HTTP method to use.
+     * @param {Object.<String, Object>} headerParams A map of header parameters and their values.
+     * @param {Object} bodyParam The value to pass as the request body.
      */
-     {{/emitJSDoc}}
-    constructHeaders(headerParams, contentTypes, accepts) {
-        var headers = {};
-        for (var param in headerParams) {
-            if (headerParams.hasOwnProperty(param) && headerParams[param] != undefined && headerParams[param] != null) {
-                headers[param] = headerParams[param];
-            }
-        }
-        var accept = this.jsonPreferredMime(accepts);
-        if (accept) {
-            headers['Accept'] = accept;
-        }
-        var contentType = this.jsonPreferredMime(contentTypes);
-        if (contentType) {
-            headers['Content-Type'] = contentType;
-        }
-        return headers;
-    }
+    makeApiCall(url, httpMethod, headerParams, bodyParam = null) {
+        var request = superagent(httpMethod, url);
 
-    {{#emitJSDoc}}
-    /**
-     * Make the specific Request Api call
-     * @param {String} method 
-     * @param {String} url 
-     * @param {Object.<String, String} options 
-     */
-     {{/emitJSDoc}}
-    makeApiCall(method, url, options) {
-        console.log('Going to make api call for ', url, " using method ", method, " and options ", JSON.stringify(options));
-        switch(method) {
-            case this.httpConstants.POST : return this.request.post(url, options);
-            case this.httpConstants.PUT : return this.request.put(url, options);
-            case this.httpConstants.GET : return this.request.get(url, options);
-            case this.httpConstants.DELETE : return this.request.delete(url, options);
-            case this.httpConstants.PATCH : return this.request.patch(url, options);
-        }  
+        request.set(this.normalizeParams(headerParams));
+
+        if (bodyParam !== null && bodyParam !== undefined) {
+            if (!request.header['Content-Type']) {
+                request.type('application/json');
+            }
+            request.send(bodyParam);
+        }
+
+        return new Promise((resolve, reject) => {
+            request.end((error, response) => {
+                if (error) {
+                    var err = {};
+                    if (response) {
+                        var response_body = "";
+                        if (response.body != null && response.body != undefined && Object.keys(response.body).length != 0) {
+                            response_body = JSON.stringify(response.body);
+                        } else {
+                            response_body = response.text;
+                        }
+                        err.status = response.status;
+                        err.response = response_body;
+                        err.message = response.res.statusMessage;
+                    } else {
+                        err.status = error.statusCode;
+                        err.message = error.rawResponse;
+                    }
+                    reject(err);
+                } else {
+                    try {
+                        var response_body = "";
+                        if (response.body != null && response.body != undefined && Object.keys(response.body).length != 0) {
+                            response_body = JSON.stringify(response.body);
+                        } else {
+                            response_body = response.text;
+                        }
+                        var response_object = {
+                            response: response_body,
+                            status: response.status
+                        };
+                        resolve(response_object);
+                    } catch (err) {
+                        reject(err);
+                    }
+                }
+            });
+        });
     }
 
     {{#emitJSDoc}}
@@ -455,57 +455,89 @@ class ApiClient {
         returnType, apiBasePath{{^usePromises}}, callback{{/usePromises}}) {
 
         var url = this.buildUrl(path, pathParams, apiBasePath);
+        var request = superagent(httpMethod, url);
         
-        queryParams = this.normalizeParams(queryParams);
-
-        // adding query params
-        url = this.addQueryParams(url, queryParams);
-
-        // adding headers
-        var headers = this.constructHeaders(headerParams, contentTypes, accepts);
+        // set query parameters
+        request.query(this.normalizeParams(queryParams));
 
         // Adding the default headers
-        headers["vendorAccountId"] = this.vendorAccountId;
-        headers["product"] = this.product;
-        headers[this.httpConstants.CONTENT_TYPE] = this.httpConstants.JSON;
+        this.defaultHeaders["vendorAccountId"] = this.vendorAccountId;
+        this.defaultHeaders["product"] = this.product;
+        this.defaultHeaders[this.httpConstants.CONTENT_TYPE] = this.httpConstants.JSON;
 
-        // apply authentications
-        // this.applyAuthToRequest(request, authNames);
+        // set header parameters
+        request.set(this.defaultHeaders).set(this.normalizeParams(headerParams));
 
-        var body = {};
-        if (bodyParam !== null && bodyParam !== undefined) {
-            body = bodyParam;
+        var contentType = this.jsonPreferredMime(contentTypes);
+        if (contentType) {
+            // Issue with superagent and multipart/form-data (https://github.com/visionmedia/superagent/issues/746)
+            if(contentType != 'multipart/form-data') {
+                request.type(contentType);
+            }
         }
 
-        var options = {
-            "headers": headers,
-            "body": JSON.stringify(body),
-            "staticIP": true
+        if (contentType === 'application/x-www-form-urlencoded') {
+            request.send(querystring.stringify(this.normalizeParams(formParams)));
+        } else if (contentType == 'multipart/form-data') {
+            var _formParams = this.normalizeParams(formParams);
+            for (var key in _formParams) {
+                if (_formParams.hasOwnProperty(key)) {
+                    if (this.isFileParam(_formParams[key])) {
+                        // file field
+                        request.attach(key, _formParams[key]);
+                    } else {
+                        request.field(key, _formParams[key]);
+                    }
+                }
+            }
+        } else if (bodyParam !== null && bodyParam !== undefined) {
+            if (!request.header['Content-Type']) {
+                request.type('application/json');
+            }
+            request.send(bodyParam);
+        }
+
+        var accept = this.jsonPreferredMime(accepts);
+        if (accept) {
+            request.accept(accept);
+        }
+
+        if (returnType === 'Blob') {
+          request.responseType('blob');
+        } else if (returnType === 'String') {
+          request.responseType('string');
         }
 
         {{#usePromises}}
         return new Promise((resolve, reject) => {
-            
-            this.makeApiCall(httpMethod, url, options).then(
-                function(response_object) {
-                    var data = {};
-                    if (response_object == null || returnType == null || response_object.status == 204 || response_object.response == "") {
-                        data = null;
-                    } else {   
-                        data = ApiClient.convertToType(JSON.parse(response_object.response), returnType);
-                    }
-                    var response = {
-                        data: data,
-                        status: response_object.status
-                    };
-                    resolve(response);
-                }, function(error) {
+            request.end((error, response) => {
+                if (error) {
                     var err = {};
-                    err.status = error.status;
-                    err.data = error.response;
+                    if (response) {
+                        err.status = response.status;
+                        err.data = response.body;
+                        err.message = response.res.statusMessage;
+                    } else {
+                        err.status = error.statusCode;
+                        err.message = error.rawResponse;
+                    }
                     reject(err);
+                } else {
+                    try {
+                        var data = this.deserialize(response, returnType);
+                        if (this.enableCookies && typeof window === 'undefined'){
+                            this.agent._saveCookies(response);
+                        }
+                        var response_object = {
+                            data: data,
+                            status: response.status
+                        };
+                        resolve(response_object);
+                    } catch (err) {
+                        reject(err);
+                    }
                 }
-            );
+            });
         });
 
         {{/usePromises}}
@@ -656,22 +688,6 @@ class ApiClient {
     {{/emitJSDoc}}
     setBasePath(basePath) {
             this.basePath = basePath;
-    }
-
-    {{#emitJSDoc}}
-    /**
-     * Add query params to the url
-     * @param {String} url 
-     * @param {Array[String]} queryParams 
-     */
-    {{/emitJSDoc}}
-    addQueryParams(url, queryParams) {
-        url = url + "?"
-        for (var key in queryParams) {
-            var value = queryParams[key];
-            url = url + "" + key + "=" + value + "&";
-        }
-        return url.slice(0, -1);
     }
 
     getBasePathFromSettings(index, variables={}) {

@@ -21,6 +21,7 @@
     "sinon": "^9.0.2"
   },
   "devDependencies": {
+    "redoc-cli": "^0.10.1",
     "vuepress": "^1.5.4"
   }
 }

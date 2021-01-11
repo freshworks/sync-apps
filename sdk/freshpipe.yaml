@@ -1686,11 +1686,23 @@ paths:
           description: Unique identifier of a Integration
           type: integer
           format: int64
+        - in: query
+          name: page
+          description: Page number to be fetched
+          type: integer
+          format: int64
+          required: false
+        - in: query
+          name: per_page
+          description: Page size parameter
+          type: integer
+          format: int64
+          required: false
       responses:
         '200':
           description: Log details
           schema:
-            $ref: '#/definitions/LogObjectList'
+            $ref: '#/definitions/PaginatedSyncLog'
         '400':
           description: Bad Request
           schema:
@@ -2033,6 +2045,15 @@ definitions:
           - DELETE
           - INPROGRESS
         example: CREATE
+  PaginatedSyncLog:
+    type: object
+    properties:
+      logs:
+        type: array
+        items:
+          $ref: '#/definitions/LogObject'
+      meta:
+          $ref: '#/definitions/PaginationMeta'
   LogObjectList:
     description: A list of log objects
     type: array

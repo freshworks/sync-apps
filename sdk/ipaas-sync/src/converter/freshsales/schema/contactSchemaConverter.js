@@ -22,7 +22,7 @@ class ContactSchemaConverter extends freshsalesService.FreshsalesConverter {
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: authToken
             }
-            contactSchemaConverter.apiClient.request.get(url, { "headers": headers}).then(
+            contactSchemaConverter.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(contactFieldsResponse) {
                     var contactFields = JSON.parse(contactFieldsResponse.response);
                     resolve(contactFields.fields);
@@ -153,7 +153,7 @@ class ContactSchemaConverter extends freshsalesService.FreshsalesConverter {
             [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
             [httpConstants.AUTHORIZATION]: this.getToken()
         }
-        var response = await this.apiClient.request.get(url, { "headers": headers })
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         return response;
     }
@@ -174,7 +174,7 @@ class ContactSchemaConverter extends freshsalesService.FreshsalesConverter {
             [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
             [httpConstants.AUTHORIZATION]: this.getToken()
         }
-        var response = await this.apiClient.request.get(url, { "headers": headers })
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         if (response['contact'] == null){
             return null;

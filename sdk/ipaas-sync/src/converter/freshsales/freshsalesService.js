@@ -52,11 +52,9 @@ class FreshsalesConverter {
 
             url += '?sort=updated_at&sort_type=asc&per_page=10&page=' + pageToFetch.toString()
             console.log("Going to get data using url: ", url);
-            var options = {
-                "headers": { [httpConstants.AUTHORIZATION]: this.authToken}
-            }
+            var headers = { [httpConstants.AUTHORIZATION]: this.authToken};
 
-            var freshsalesResponse = await this.apiClient.request.get(url, options);
+            var freshsalesResponse = await this.apiClient.makeApiCall(url, 'GET', headers);
             console.log('Fetched the next page successfully');
             freshsalesResponse = JSON.parse(freshsalesResponse.response)
             if (entity === 'lead') {
@@ -74,10 +72,8 @@ class FreshsalesConverter {
         switch(entity){
             case 'lead': 
             var url = this.domain + '/api/leads/filters';
-            var options = {
-                "headers": {[httpConstants.AUTHORIZATION]: this.authToken}
-            }
-            var leadFilterResponse = await this.apiClient.request.get(url, options);
+            var headers = {[httpConstants.AUTHORIZATION]: this.authToken};
+            var leadFilterResponse = await this.apiClient.makeApiCall(url, 'GET', headers);
             leadFilterResponse = JSON.parse(leadFilterResponse.response)['filters'];
             for (var index in leadFilterResponse){
                 console.log(leadFilterResponse[index]['name'])
@@ -88,10 +84,8 @@ class FreshsalesConverter {
             break;
             case 'contact':
             var url = this.domain + '/api/contacts/filters';
-            var options = {
-                "headers": {[httpConstants.AUTHORIZATION]: this.authToken}
-            }
-            var contactFilterResponse = await this.apiClient.request.get(url, options);
+            var headers = {[httpConstants.AUTHORIZATION]: this.authToken};
+            var contactFilterResponse = await this.apiClient.makeApiCall(url, 'GET', headers);
             contactFilterResponse = JSON.parse(contactFilterResponse.response)['filters'];
             for (var index in contactFilterResponse){
                 console.log(contactFilterResponse[index]['name'])

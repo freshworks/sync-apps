@@ -21,7 +21,7 @@ class EmployeeSchemaConverter extends freshteam.FreshteamConverter {
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: "Bearer " + employeeSchemaConverterObject.getAPIToken()
             }
-            employeeSchemaConverterObject.apiClient.request.get(url, { "headers": headers}).then(
+            employeeSchemaConverterObject.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(employeeFieldsResponse) {
                     resolve(JSON.parse(employeeFieldsResponse.response));
                 },
@@ -39,7 +39,7 @@ class EmployeeSchemaConverter extends freshteam.FreshteamConverter {
             [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
             [httpConstants.AUTHORIZATION]: "Bearer " + this.getAPIToken()
         }
-        var response = await this.apiClient.request.get(url, { "headers": headers});
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         if (response.length == 0){
             return null;
@@ -53,7 +53,7 @@ class EmployeeSchemaConverter extends freshteam.FreshteamConverter {
             [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
             [httpConstants.AUTHORIZATION]: "Bearer " + this.getAPIToken()
         }
-        var response = await this.apiClient.request.get(url, { "headers": headers});
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         return response;
     }

@@ -29,7 +29,7 @@ class MemberSchemaConverter {
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: "Bearer " + memberSchemaConverterObject.getAPIToken()
             }
-            memberSchemaConverterObject.apiClient.request.get(url, { "headers": headers}).then(
+            memberSchemaConverterObject.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(memberFieldsResponse) {
                     memberFieldsResponse = memberFieldsResponse.response;
                     console.log("merge fields response: ", memberFieldsResponse);
@@ -305,11 +305,9 @@ class MemberSchemaConverter {
                     'api': true
                 }
             }
-            var options = {
-                "headers": { [httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken, [httpConstants.CONTENT_TYPE]: 'application/json'},
-                "body": JSON.stringify(payload)
-            }
-            var webhookCreateResponse = await this.apiClient.request.post(url, options);
+            var headers = { [httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken, [httpConstants.CONTENT_TYPE]: 'application/json'};
+                
+            var webhookCreateResponse = await this.apiClient.makeApiCall(url, 'POST', headers, payload);
             console.log('Webhook created successfully', webhookCreateResponse.response);
             var resp = JSON.parse(webhookCreateResponse.response)
             return resp;
@@ -323,10 +321,9 @@ class MemberSchemaConverter {
         try {
             var url = this.domain + '/3.0/lists/' + listId + '/webhooks/' +  webhookId;
             
-            var options = {
-                "headers": { [httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken, [httpConstants.CONTENT_TYPE]: 'application/json'},
-            }
-            var webhookDeleteResponse = await this.apiClient.request.delete(url, options);
+            var headers = { [httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken, [httpConstants.CONTENT_TYPE]: 'application/json'};
+            
+            var webhookDeleteResponse = await this.apiClient.makeApiCall(url, 'DELETE', headers);
             console.log('Webhook deleted successfully', webhookDeleteResponse.response);
             var resp = webhookDeleteResponse.response
             return resp;
@@ -340,10 +337,9 @@ class MemberSchemaConverter {
         try {
             var url = this.domain + '/3.0/lists/'
             console.log("Going to get lists using url: ", url);
-            var options = {
-                "headers": {[httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken}
-            }
-            var lists = await this.apiClient.request.get(url, options)
+            var headers = {[httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken}
+            
+            var lists = await this.apiClient.makeApiCall(url, 'GET', headers);
             lists = JSON.parse(lists.response)
             lists = lists['lists']
             var listMap = {};
@@ -361,11 +357,9 @@ class MemberSchemaConverter {
     async getMember(email){
         try {
             var url = this.domain + '/3.0/search-members?query=' + email;
-            var options = {
-                "headers": {[httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken},
-            }
+            var headers = {[httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken}
             console.log('Going to fetch mailchimp member using url', url)
-            var memberData = await this.apiClient.request.get(url, options)
+            var memberData = await this.apiClient.makeApiCall(url, 'GET', headers);
             memberData = memberData.response
             return JSON.parse(memberData)['exact_matches']['members'][0];
         } catch(e) {
@@ -386,10 +380,8 @@ class MemberSchemaConverter {
             var offset = (pageToFetch - 1) * 10 
             var url = connector.domain + '/3.0/lists/' + listId + '/members?sort_field=last_changed&sort_dir=ASC&count=10&offset=' + offset.toString()
             console.log("Going to get members using url: ", url);
-            var options = {
-                "headers": {[httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken}
-            }
-            var memberResponse = await this.apiClient.request.get(url, options)
+            var headers = {[httpConstants.AUTHORIZATION]: 'Bearer ' + this.authToken}
+            var memberResponse = await this.apiClient.makeApiCall(url, 'GET', headers);
             memberResponse = JSON.parse(memberResponse.response)
             return response['members'];
         } catch(e) {

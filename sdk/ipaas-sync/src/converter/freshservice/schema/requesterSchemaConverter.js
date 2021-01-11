@@ -30,7 +30,7 @@ class RequesterSchemaConverter{
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: "Basic " + requesterSchemaConverterObject.getAPIToken()
             }
-            requesterSchemaConverterObject.apiClient.request.get(url, { "headers": headers}).then(
+            requesterSchemaConverterObject.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(requesterFieldsResponse) {
                     resolve(JSON.parse(requesterFieldsResponse.response));
                 },
@@ -178,7 +178,7 @@ class RequesterSchemaConverter{
             [httpConstants.AUTHORIZATION]: "Basic " + this.getAPIToken()
         }
         
-        var response = await this.apiClient.request.get(url, { "headers": headers});
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         if (response['requesters'].length == 0){
             return null;
@@ -194,7 +194,7 @@ class RequesterSchemaConverter{
             [httpConstants.AUTHORIZATION]: "Basic " + this.getAPIToken()
         }
         
-        var response = await this.apiClient.request.get(url, { "headers": headers});
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         
         return response['requester'];
@@ -214,15 +214,12 @@ class RequesterSchemaConverter{
             "event_data": [{"name": "user_action" ,"value": "create"}, {"name": "user_action" ,"value": "update"}]
         }
 
-        var reqData = {
-            "headers": {
-                [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
-                [httpConstants.AUTHORIZATION]: "Basic " + this.getAPIToken()
-            },
-            "body": JSON.stringify(payload)
-          };
+        var headers = {
+            [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
+            [httpConstants.AUTHORIZATION]: "Basic " + this.getAPIToken()
+        };
 
-        var response = await this.apiClient.request.post(url, reqData);
+        var response = await this.apiClient.makeApiCall(url, 'POST', headers, payload);
         response = JSON.parse(response.response)
         
         return response;
@@ -235,14 +232,12 @@ class RequesterSchemaConverter{
 
         var url = this.getDomain() + `/webhooks/subscription/${webhookId}.json`
 
-        var reqData = {
-            "headers": {
-                [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
-                [httpConstants.AUTHORIZATION]: "Basic " + this.getAPIToken()
-            }
+        var headers = {
+            [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
+            [httpConstants.AUTHORIZATION]: "Basic " + this.getAPIToken()
         };
 
-        var response = await this.apiClient.request.delete(url, reqData);
+        var response = await this.apiClient.makeApiCall(url, 'DELETE', headers);
         response = JSON.parse(response.response)
         
         return response;

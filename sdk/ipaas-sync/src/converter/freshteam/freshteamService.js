@@ -31,7 +31,7 @@ class FreshteamConverter {
             [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
             [httpConstants.AUTHORIZATION]: "Bearer " + this.getAPIToken()
         }
-        var response = await this.apiClient.request.get(url, { "headers": headers});
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         
         for (var i in response){

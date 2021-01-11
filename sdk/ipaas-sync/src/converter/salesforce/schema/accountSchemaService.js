@@ -25,7 +25,7 @@ class AccountSchemaConverter extends salesforce.SalesForceConverter {
                         [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                         [httpConstants.AUTHORIZATION]: 'Bearer ' + token
                     }
-                    accountSchemaConverterObject.apiClient.request.get(url, {'headers': headers}).then(
+                    accountSchemaConverterObject.apiClient.makeApiCall(url, 'GET', headers).then(
                         function(response) {
                             console.log('Fetched the contact fields: ', response.response)
                             resolve(JSON.parse(response.response).fields)
@@ -136,11 +136,8 @@ class AccountSchemaConverter extends salesforce.SalesForceConverter {
                     var url = accountSchemaConverterObject.getDomain() + '/services/data/v48.0/query/?q=' +  query 
                     accountSchemaConverterObject.getApiToken().then(
                         function(apiToken) {
-                            var reqData = {
-                                "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-                            }
-                            console.log('request body', reqData)
-                            accountSchemaConverterObject.apiClient.request.get(url, reqData).then(
+                            var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'};
+                            accountSchemaConverterObject.apiClient.makeApiCall(url, 'GET', headers).then(
                                 function(response) {
                                     console.log('Fetched the accounts', response.response)
                                     resolve(JSON.parse(response.response)['records'])
@@ -215,11 +212,8 @@ class AccountSchemaConverter extends salesforce.SalesForceConverter {
         var query = `SELECT Id,Name FROM Account where ${field.toString()} like '${value.toString()}'`;
         var url = this.getDomain() + '/services/data/v48.0/query?q=' + encodeURI(query);
         var apiToken = await this.getApiToken();
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-        }
-        console.log('request body', reqData)
-        var response = await this.apiClient.request.get(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'}
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers)
         response = JSON.parse(response.response)['records']
         return response[0];
     }
@@ -227,10 +221,8 @@ class AccountSchemaConverter extends salesforce.SalesForceConverter {
     async getObjectById(objectId) {
         var url = this.getDomain() + '/services/data/v48.0/sobjects/Account/' +  objectId; 
         var apiToken = await this.getApiToken()
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-        }
-        var response =  await this.apiClient.request.get(url, reqData);
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'};
+        var response =  await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response);
         return response;
     }

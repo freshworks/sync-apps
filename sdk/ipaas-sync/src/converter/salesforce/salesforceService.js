@@ -79,7 +79,7 @@ class SalesForceConverter {
         var salesforce = this;
         console.log('Fetching the access token using refresh token.');
         return new Promise(function(resolve, reject){
-            salesforce.apiClient.request.get(refresh_url).then(
+            salesforce.apiClient.makeApiCall(url, 'GET', {}).then(
                 function(response){
                     console.log("Access token fetch successful.")
                     resolve(JSON.parse(response.response).access_token);
@@ -102,7 +102,8 @@ class SalesForceConverter {
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: 'Bearer ' + salesforce.authToken
             }
-            salesforce.apiClient.request.get('https://login.salesforce.com/services/oauth2/userinfo', {'headers': headers}).then(
+            var url = 'https://login.salesforce.com/services/oauth2/userinfo';
+            salesforce.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(response) {
                     console.log('User info fetch successful.')
                     resolve(JSON.parse(response.response));
@@ -202,10 +203,8 @@ class SalesForceConverter {
             salesforce.getApiToken().then(
                 function(apiToken){
                     var url = salesforce.domain + "/services/data/v48.0/tooling/query?q=select name from WorkflowOutboundMessage where name='" + name + "'"
-                    var reqData = {
-                        "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-                    }
-                    salesforce.apiClient.request.get(url, reqData).then(
+                    var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'}
+                    salesforce.apiClient.makeApiCall(url, 'GET', headers).then(
                         function(response) {
                             console.log('fetched the outbound data', response.response)
                             response = JSON.parse(response.response)
@@ -228,12 +227,8 @@ class SalesForceConverter {
                                         },
                                         "FullName": entity + "." + name
                                     }
-                                    var reqData = {
-                                        "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-                                        "body": JSON.stringify(body)
-                                    }
-                                    console.log(reqData)
-                                    salesforce.apiClient.request.post(url, reqData).then(
+                                    console.log(`Headers: ${JSON.stringify(headers)} Body: ${JSON.stringify(body)}`);
+                                    salesforce.apiClient.makeApiCall(url, 'POST', headers, body).then(
                                         function(response) {
                                             console.log('created the outbound message')
                                             resolve(response.response)
@@ -262,10 +257,8 @@ class SalesForceConverter {
             salesforce.getApiToken().then(
                 function(apiToken){
                     var url = salesforce.domain + "/services/data/v48.0/tooling/query?q=select name from workflowrule where name='" + name + "'"
-                    var reqData = {
-                        "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-                    }
-                    salesforce.apiClient.request.get(url, reqData).then(
+                    var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'}
+                    salesforce.apiClient.makeApiCall(url, 'GET', headers).then(
                         function(response) {
                             console.log('fetched the workflow rule data', response.response)
                             response = JSON.parse(response.response)
@@ -295,12 +288,9 @@ class SalesForceConverter {
                                 },
                                 "FullName": entity + "." + name
                             }
-                            var reqData = {
-                                "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-                                "body": JSON.stringify(body)
-                            }
-                            console.log('request body', reqData)
-                            salesforce.apiClient.request.post(url, reqData).then(
+                            var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'};
+                            console.log(`Headers: ${JSON.stringify(headers)} Body: ${JSON.stringify(body)}`);
+                            salesforce.apiClient.makeApiCall(url, 'POST', headers, body).then(
                                 function(response) {
                                     console.log('created the workflow rule')
                                     resolve(response)
@@ -327,10 +317,8 @@ class SalesForceConverter {
         var name = `FreshdeskApp${entity}Trigger`;
         var apiToken = await this.getApiToken()
         var url = this.domain + "/services/data/v48.0/tooling/query?q=select Id from ApexClass where name='" + name + "'"
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-        }
-        var response = await this.apiClient.request.get(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'}
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         console.log('fetched the apex class data', response.response)
         response = JSON.parse(response.response)
         if (response.size == 1){
@@ -341,10 +329,8 @@ class SalesForceConverter {
 
         //delete created Apex trigger
         var url = this.domain + "/services/data/v48.0/tooling/query?q=select Id from ApexTrigger where name='" + apexTriggerName + "'"
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-        }
-        var response = await this.apiClient.request.get(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'};
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         console.log('fetched the apex Trigger data', response.response)
         response = JSON.parse(response.response)
         if (response.size == 1){
@@ -358,10 +344,8 @@ class SalesForceConverter {
         var name = `FreshdeskApp${entity}Trigger`;
         var apiToken = await this.getApiToken()
         var url = this.domain + "/services/data/v48.0/tooling/query?q=select name from ApexClass where name='" + name + "'"
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-        }
-        var response = await this.apiClient.request.get(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'};
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers)
         console.log('fetched the apex class data', response.response)
         response = JSON.parse(response.response)
         if (response.size == 1){
@@ -374,22 +358,17 @@ class SalesForceConverter {
             "Name": name,
             "Body": this.getApexClass(entity, webhookUrl, fields)
         }
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-            "body": JSON.stringify(body)
-        }
-        console.log(reqData)
-        var response = await this.apiClient.request.post(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'};
+        console.log(`Headers: ${JSON.stringify(headers)} Body: ${JSON.stringify(body)}`);
+        var response = await this.apiClient.makeApiCall(url, 'POST', headers, body);
         console.log('created the apex class for entity.')                     
     }
 
     async createApexTrigger(entity, name, event){
         var apiToken = await this.getApiToken()
         var url = this.domain + "/services/data/v48.0/tooling/query?q=select name from ApexTrigger where name='" + name + "'"
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-        }
-        var response = await this.apiClient.request.get(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'}
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers)
         console.log('fetched the apex class data', response.response)
         response = JSON.parse(response.response)
         if (response.size == 1){
@@ -402,12 +381,9 @@ class SalesForceConverter {
             "EntityDefinitionId": event
         }
         var url = this.domain + '/services/data/v48.0/tooling/sobjects/ApexTrigger';
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-            "body": JSON.stringify(body)
-        }
-        console.log(reqData)
-        var response = await this.apiClient.request.post(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'}
+        console.log(`Headers: ${JSON.stringify(headers)} Body: ${JSON.stringify(body)}`);
+        var response = await this.apiClient.makeApiCall(url, 'POST', headers, body);
         console.log('created the apex class for entity.')  
     }
 
@@ -415,10 +391,8 @@ class SalesForceConverter {
         const name = 'FreshdeskWebhookUrl';
         var apiToken = await this.getApiToken()
         var url = this.domain + "/services/data/v48.0/tooling/query?q=select SiteName from RemoteProxy where SiteName='" + name + "'"
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-        }
-        var response = await this.apiClient.request.get(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'}
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         console.log('fetched the apex class data', response.response)
         response = JSON.parse(response.response)
         if (response.size == 1){
@@ -436,22 +410,17 @@ class SalesForceConverter {
         }
         
         var url = this.domain + '/services/data/v48.0/tooling/sobjects/RemoteProxy';
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-            "body": JSON.stringify(body)
-        }
-        console.log(reqData)
-        var response = await this.apiClient.request.post(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'};
+        console.log(`Headers: ${JSON.stringify(headers)} Body: ${JSON.stringify(body)}`);
+        var response = await this.apiClient.makeApiCall(url, 'POST', headers, body);
         console.log('created the apex class for entity.') 
     }
 
     async addChannelMembers(){
         var apiToken = await this.getApiToken()
         var url = this.domain + "/services/data/v48.0/tooling/query?q=select MasterLabel from PlatformEventChannelMember where MasterLabel in ('AccountChangeEvent', 'ContactChangeEvent')"
-        var reqData = {
-            "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-        }
-        var response = await this.apiClient.request.get(url, reqData)
+        var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'}
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers)
         console.log('fetched the apex class data', response.response)
         response = JSON.parse(response.response)
         if (response.size == 2){
@@ -478,12 +447,9 @@ class SalesForceConverter {
                 }
                 
                 var url = this.domain + '/services/data/v48.0/tooling/sobjects/PlatformEventChannelMember';
-                var reqData = {
-                    "headers": {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'},
-                    "body": JSON.stringify(body)
-                }
-                console.log(reqData)
-                var response = await this.apiClient.request.post(url, reqData)
+                var headers = {"Authorization": 'Bearer ' + apiToken, 'content-type': 'application/json'};
+                console.log(`Headers: ${JSON.stringify(headers)} Body: ${JSON.stringify(body)}`);
+                var response = await this.apiClient.makeApiCall(url, 'POST', headers, body)
                 console.log('created the apex class for entity.') 
             }
         }
