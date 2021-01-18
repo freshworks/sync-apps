@@ -82,7 +82,7 @@ class MonsterConverter {
                                         <Criteria>JobRefCode</Criteria>
                                         <Value>${params.jobReferenceCode}</Value>
                                         <Criteria>RecruiterName</Criteria>
-                                        <Value>xrtpjobsx01</Value>
+                                        <Value>${this.username}</Value>
                                     </SelectBy>
                                     </Query>
                                 </SOAP-ENV:Body>
@@ -97,7 +97,7 @@ class MonsterConverter {
                                     <Monster:Target>JobPosting</Monster:Target>
                                         <Monster:DeleteBy>
                                             <Monster:Criteria>RecruiterName</Monster:Criteria>
-                                            <Monster:Value>xrtpjobsx01</Monster:Value>
+                                            <Monster:Value>${this.username}</Monster:Value>
                                         </Monster:DeleteBy>
                                         <Monster:DeleteBy>
                                             <Monster:Criteria>RefCode</Monster:Criteria>
