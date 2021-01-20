@@ -22,7 +22,7 @@ class LeadSchemaConverter extends freshsalesService.FreshsalesConverter {
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: authToken
             }
-            leadSchemaConverter.apiClient.request.get(url, { "headers": headers}).then(
+            leadSchemaConverter.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(leadFieldsResponse) {
                     var leadFields = JSON.parse(leadFieldsResponse.response);
                     resolve(leadFields.fields);
@@ -135,7 +135,7 @@ class LeadSchemaConverter extends freshsalesService.FreshsalesConverter {
             [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
             [httpConstants.AUTHORIZATION]: this.getToken()
         }
-        var response = await this.apiClient.request.get(url, { "headers": headers })
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         if (response['leads'] == null || response['leads']['leads'].length == 0){
             return null;
@@ -151,7 +151,7 @@ class LeadSchemaConverter extends freshsalesService.FreshsalesConverter {
             [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
             [httpConstants.AUTHORIZATION]: this.getToken()
         }
-        var response = await this.apiClient.request.get(url, { "headers": headers })
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         if (response['lead'] == null){
             return null;

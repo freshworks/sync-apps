@@ -21,7 +21,7 @@ class JobPostingSchemaConverter extends freshteam.FreshteamConverter {
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: "Bearer " + jobPostingSchemaConverterObject.getAPIToken()
             }
-            jobPostingSchemaConverterObject.apiClient.request.get(url, { "headers": headers}).then(
+            jobPostingSchemaConverterObject.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(employeeFieldsResponse) {
                     resolve(JSON.parse(employeeFieldsResponse.response));
                 },

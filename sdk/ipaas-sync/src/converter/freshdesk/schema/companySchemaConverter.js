@@ -25,7 +25,7 @@ class CompanySchemaConverter extends freshdesk.FreshdeskConverter{
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: companySchemaConverterObject.getApiToken()
             }
-            companySchemaConverterObject.apiClient.request.get(url, { "headers": headers}).then(
+            companySchemaConverterObject.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(companyFieldsResponse) {
                     resolve(JSON.parse(companyFieldsResponse.response));
                 },
@@ -91,10 +91,8 @@ class CompanySchemaConverter extends freshdesk.FreshdeskConverter{
         return new Promise(function(resolve, reject) {
             var url = contact.domain + '/api/v2/companies?per_page=10&page=' + pageToFetch.toString();
             console.log("Going to get data using url: ", url);
-            var options = {
-                "headers": {[httpConstants.AUTHORIZATION]: contact.getApiToken()}
-            }
-            contact.apiClient.request.get(url, options).then(
+            var headers = {[httpConstants.AUTHORIZATION]: contact.getApiToken()}
+            contact.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(contactsResponse){
                     console.log('Fetched the next page successfully');
                     var response = JSON.parse(contactsResponse.response)
@@ -111,10 +109,8 @@ class CompanySchemaConverter extends freshdesk.FreshdeskConverter{
     async getObject(field, value) {
         var url = this.domain + "/api/v2/companies/autocomplete?name=" + encodeURI(value.toString());
         console.log("Going to get data using url: ", url);
-        var options = {
-            "headers": {[httpConstants.AUTHORIZATION]: this.getApiToken()}
-        }
-        var response = await this.apiClient.request.get(url, options)
+        var headers = {[httpConstants.AUTHORIZATION]: this.getApiToken()}
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         response = response['companies'];
         for (var index in response){
@@ -129,10 +125,8 @@ class CompanySchemaConverter extends freshdesk.FreshdeskConverter{
     async getObjectById(objectId) {
         var url = this.domain + '/api/v2/companies/' + objectId.toString();
         console.log("Going to get data using url: ", url);
-        var options = {
-            "headers": {[httpConstants.AUTHORIZATION]: this.getApiToken()}
-        }
-        var response = await this.apiClient.request.get(url, options)
+        var headers = {[httpConstants.AUTHORIZATION]: this.getApiToken()}
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         return response;       
     }

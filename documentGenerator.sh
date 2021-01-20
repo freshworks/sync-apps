@@ -1,5 +1,6 @@
 #!/bin/bash
-# npm install -D vuepress
+rm -rf documentation/
+mkdir documentation
 cd sdk
 rm -rf ipaas-sync/dist
 rm -rf ipaas-sync/docs
@@ -20,6 +21,5 @@ cd ..
 mv sdk/ipaas-sync/docs documentation/
 mv sdk/ipaas-sync/README.md documentation/
 npm run docs:build
-# docker stop doc_server || true
-# docker system prune -f
-# docker run -itd -p 10000:80 -v "$(pwd)/documentation/.vuepress/dist":/usr/local/apache2/htdocs --name doc_server httpd
+cp ./sdk/doc_config/* ./documentation/.vuepress
+npm run docs:build

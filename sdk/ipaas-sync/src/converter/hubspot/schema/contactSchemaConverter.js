@@ -67,7 +67,7 @@ class ContactSchemaConverter {
         }
         console.log('Fetching the access token using refresh token.');
         return new Promise(function (resolve, reject) {
-            contactSchemaConverter.apiClient.request.post(refresh_url, {"headers": headers}).then(
+            contactSchemaConverter.apiClient.makeApiCall(url, 'POST', headers).then(
                 function (response) {
                     console.log("Access token fetch successful.");
                     resolve(JSON.parse(response.response).access_token);
@@ -92,7 +92,7 @@ class ContactSchemaConverter {
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: 'Bearer ' + contactSchemaConverter.authToken
             }
-            contactSchemaConverter.apiClient.request.get(url, { "headers": headers} ).then(
+            contactSchemaConverter.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(contactFieldsResponse) {
                     resolve(JSON.parse(contactFieldsResponse.response));
                 },

@@ -19,7 +19,7 @@ class AccountSchemaConverter extends freshsalesService.FreshsalesConverter {
                 [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
                 [httpConstants.AUTHORIZATION]: accountSchemaConverter.getToken()
             }
-            accountSchemaConverter.apiClient.request.get(url, { "headers": headers }).then(
+            accountSchemaConverter.apiClient.makeApiCall(url, 'GET', headers).then(
                 function(accountFieldsResponse) {
                     var accountFields = JSON.parse(accountFieldsResponse.response);
                     resolve(accountFields.fields);
@@ -90,7 +90,7 @@ class AccountSchemaConverter extends freshsalesService.FreshsalesConverter {
             [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
             [httpConstants.AUTHORIZATION]: this.getToken()
         }
-        var response = await this.apiClient.request.get(url, { "headers": headers })
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         if (response['sales_accounts'] == null || response['sales_accounts']['sales_accounts'].length == 0){
             return null;
@@ -106,7 +106,7 @@ class AccountSchemaConverter extends freshsalesService.FreshsalesConverter {
             [httpConstants.CONTENT_TYPE]: httpConstants.APPLICATION_JSON,
             [httpConstants.AUTHORIZATION]: this.getToken()
         }
-        var response = await this.apiClient.request.get(url, { "headers": headers })
+        var response = await this.apiClient.makeApiCall(url, 'GET', headers);
         response = JSON.parse(response.response)
         if (response['sales_account'] == null){
             return null;
