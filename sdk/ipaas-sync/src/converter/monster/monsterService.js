@@ -32,11 +32,7 @@ class MonsterConverter {
                 </From>
                 <To>
                     <PartyId partyType="organization">Monster</PartyId>
-                </To>
-                <MessageData>
-                    <MessageId>90805_090855AM_90805_090855AM</MessageId>
-                    <Timestamp>2005-09-08T08:45:34Z</Timestamp>
-                </MessageData>
+                </To>                
             </MonsterHeader>
         </SOAP-ENV:Header>`;
   }
