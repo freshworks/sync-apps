@@ -21,6 +21,8 @@ var salesforceContactConverter = require('./salesforce/schema/contactSchemaServi
 
 var salesforceAccountConverter = require('./salesforce/schema/accountSchemaService');
 
+var monsterJobPostingConverter = require('./monster/schema/jobPostingSchemaConverter');
+
 class Converter {
 
     constructor(connector, entity, domain, authToken, clientId, clientSecret, refreshToken) {
@@ -34,9 +36,9 @@ class Converter {
     }
 
     getConverter() {
-        switch(this.connector) {
+        switch (this.connector) {
             case constants.FRESHDESK:
-                switch(this.entity) {
+                switch (this.entity) {
                     case "fd_contact":
                         return new freshdeskContactConverter.ContactSchemaConverter(this.authToken, this.domain);
                     case "fd_company":
@@ -44,7 +46,7 @@ class Converter {
                 }
                 break;
             case constants.FRESHSALES:
-                switch(this.entity) {
+                switch (this.entity) {
                     case "fs_contact":
                         return new freshsalesContactConverter.ContactSchemaConverter(this.authToken, this.domain);
                     case "fs_lead":
@@ -54,38 +56,45 @@ class Converter {
                 }
                 break;
             case constants.MAILCHIMP:
-                switch(this.entity) {
+                switch (this.entity) {
                     case "mc_member":
-                    return new mailChimpConverter.MemberSchemaConverter(this.authToken, this.domain);
+                        return new mailChimpConverter.MemberSchemaConverter(this.authToken, this.domain);
                 }
                 break;
             case constants.HUBSPOT:
-                switch(this.entity) {
+                switch (this.entity) {
                     case "hs_contact":
-                    return new hubspotConverter.ContactSchemaConverter(this.clientId, this.clientSecret, this.refreshToken, this.authToken, this.domain);
+                        return new hubspotConverter.ContactSchemaConverter(this.clientId, this.clientSecret, this.refreshToken, this.authToken, this.domain);
                 }
                 break;
             case constants.FRESHTEAM:
-                switch(this.entity) {
-                    case "ft_employee": 
+                switch (this.entity) {
+                    case "ft_employee":
                         return new freshteamEmployeeConverter.EmployeeSchemaConverter(this.authToken, this.domain);
                     case "ft_job_posting":
                         return new freshteamJobPostingConverter.JobPostingSchemaConverter(this.authToken, this.domain);
                 }
                 break;
             case constants.FRESHSERVICE:
-                switch(this.entity) {
-                    case "fsr_requester": 
+                switch (this.entity) {
+                    case "fsr_requester":
                         return new freshserviceConverter.RequesterSchemaConverter(this.authToken, this.domain);
                 }
                 break;
             case constants.SALESFORCE:
-                switch(this.entity) {
+                switch (this.entity) {
                     case "sf_contact":
                         return new salesforceContactConverter.ContactSchemaConverter(this.clientId, this.clientSecret, this.refreshToken, this.authToken, this.domain);
                     case "sf_account":
                         return new salesforceAccountConverter.AccountSchemaConverter(this.clientId, this.clientSecret, this.refreshToken, this.authToken, this.domain);
                 }
+                break;
+            case constants.MONSTER:
+                switch (this.entity) {
+                    case "mt_job_posting":
+                        return new monsterJobPostingConverter.JobPostingSchemaConverter(this.domain, this.clientId, this.clientSecret);
+                }
+
                 break;
         }
         return null;
@@ -93,7 +102,7 @@ class Converter {
 
 }
 
-function getInstance(connector, entity, domain, authToken, clientId=null, clientSecret=null, refreshToken=null) {
+function getInstance(connector, entity, domain, authToken, clientId = null, clientSecret = null, refreshToken = null) {
     var converter = new Converter(connector, entity, domain, authToken, clientId, clientSecret, refreshToken);
     return converter.getConverter();
 }
@@ -101,4 +110,3 @@ function getInstance(connector, entity, domain, authToken, clientId=null, client
 module.exports = {
     getInstance
 }
-
